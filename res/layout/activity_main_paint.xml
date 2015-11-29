@@ -1,17 +1,17 @@
 
-<com.freedoodle.ui.EXRelativeLayout 
+<cn.fjnu.edu.paint.ui.EXRelativeLayout 
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/rlay">
-	<com.freedoodle.ui.DrawScrollView
+	<cn.fjnu.edu.paint.ui.DrawScrollView
 	    android:scrollbarSize="10dp"
 	    android:id="@+id/scrollview"
 	    android:fillViewport="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <com.freedoodle.ui.DrawHorizontalViw
+        <cn.fjnu.edu.paint.ui.DrawHorizontalViw
             android:scrollbarSize="10dp"
             android:id="@+id/horizontalscroll"
             android:layout_gravity="center_vertical|center_horizontal"
@@ -23,15 +23,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:orientation="vertical">
-				<com.freedoodle.engine.DrawView
+				<cn.fjnu.edu.paint.engine.DrawView
 				    android:scaleType="fitXY"
 				    android:id="@+id/img_canvans"
 				    android:layout_height="wrap_content"
 				    android:layout_width="wrap_content"
 				    android:contentDescription="@string/canvansimg"/>
 			   </LinearLayout>
-		</com.freedoodle.ui.DrawHorizontalViw>
-    </com.freedoodle.ui.DrawScrollView>
+		</cn.fjnu.edu.paint.ui.DrawHorizontalViw>
+    </cn.fjnu.edu.paint.ui.DrawScrollView>
 	    <SeekBar 
             android:id="@+id/zoom_seekbar"
             android:layout_width="match_parent"
@@ -123,4 +123,4 @@
 	 	          android:contentDescription="@string/mainimg"/>
 	 	         
 	 	  </LinearLayout>
-</com.freedoodle.ui.EXRelativeLayout>
+</cn.fjnu.edu.paint.ui.EXRelativeLayout>

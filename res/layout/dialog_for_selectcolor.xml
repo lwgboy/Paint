@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    <com.freedoodle.ui.ColorPicker
+    <cn.fjnu.edu.paint.ui.ColorPicker
     android:id="@+id/picker"
     android:layout_gravity="center_horizontal"
     android:layout_width="150dp"
@@ -21,7 +21,7 @@
         android:layout_gravity="center_horizontal"
         android:text="@string/alphasetting"
         android:textSize="20sp" />
-	<com.freedoodle.ui.OpacityBar
+	<cn.fjnu.edu.paint.ui.OpacityBar
     android:id="@+id/opacitybar"
     android:layout_gravity="center_horizontal"
     android:layout_width="wrap_content"

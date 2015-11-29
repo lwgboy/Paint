@@ -27,13 +27,13 @@
         android:smallScreens="true"
         android:xlargeScreens="true"/>
     <application
-        android:name="com.freedoodle.system.PaintApplication"
+        android:name="cn.fjnu.edu.paint.system.PaintApplication"
         android:allowBackup="true"
         android:icon="@drawable/rm0"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo.Light.DarkActionBar">
         <activity
-            android:name="com.freedoodle.ui.activity.SplashActivity"
+            android:name="cn.fjnu.edu.ui.activity.SplashActivity"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -43,17 +43,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.freedoodle.ui.activity.PaintMainActivity"
+            android:name="cn.fjnu.edu.ui.activity.PaintMainActivity"
             android:label="@string/mainname" 
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name="com.freedoodle.ui.activity.MultiPhotoSelectActivity"
+            android:name="cn.fjnu.edu.ui.activity.MultiPhotoSelectActivity"
             android:label="@string/puzzlephoto" 
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name="com.freedoodle.ui.activity.RecomActivity"
+            android:name="cn.fjnu.edu.ui.activity.RecomActivity"
             android:icon="@drawable/app_rm"
             android:label="@string/apprecom" 
             android:screenOrientation="portrait">
