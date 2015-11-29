@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="desnames">
+        <item>与众不同的绘画软件</item>
+        <item>随时随地记录生活的点点滴滴</item>
+    </string-array>
+    <string-array name="appnames">
+        <item>涂鸦画图</item>
+        <item>随手记</item>
+    </string-array>
+    <string-array name="packagenames">
+        <item>cn.fjnu.edu.paint</item>
+        <item>cn.edu.fjnu.notebook</item>
+    </string-array>
+</resources>
