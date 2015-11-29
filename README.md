@@ -1,3 +1,4 @@
 # Paint
 一款绘画软件
-课外时间用的
+
+使用Android SDK内部API倾力打造
