@@ -21,4 +21,6 @@ android {
 dependencies {
     compile files('libs/androidutil.jar')
     compile files('libs/universal-image-loader-1.6.1-with-src.jar')
+    compile files('libs/qhad_0.1.12.1113.jar')
+    compile 'com.android.support:support-v4:23.3.0'
 }

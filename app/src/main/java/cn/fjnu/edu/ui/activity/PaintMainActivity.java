@@ -16,8 +16,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.speech.RecognizerIntent;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,17 +27,22 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ZoomControls;
+
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.qhad.ads.sdk.adcore.Qhad;
+import com.qhad.ads.sdk.interfaces.IQhBannerAd;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+
 import cn.edu.fjnu.utils.OPUtils;
 import cn.fjnu.edu.paint.R;
 import cn.fjnu.edu.paint.adapter.PastePhotoAdapter;
@@ -99,14 +102,16 @@ public class PaintMainActivity extends Activity {
 	private int createHeight;
 	private android.widget.LinearLayout.LayoutParams createLayoutParams;
 	private boolean isBlackColor=false;
-
 	private String paintText=null;
-
+	//广告容器页面
+	private RelativeLayout mLayoutAd;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main_paint);
 		init();
+		//初始化广告
+		initAd();
 		initMainImage();
 		initIMageLoader();
 		canvansImageView.setImageResource(R.drawable.app_rm);
@@ -141,8 +146,8 @@ public class PaintMainActivity extends Activity {
 	}
 
 	public void init() {
+		mLayoutAd = (RelativeLayout) findViewById(R.id.layout_ad);
 		MActivity = PaintMainActivity.this;
-		// ����Ŀ¼
 		String saveDir = Environment.getExternalStorageDirectory()
 				+ "/drawphoto";
 		File saveDirFile = new File(saveDir);
@@ -201,6 +206,14 @@ public class PaintMainActivity extends Activity {
 			}
 		});
 
+	}
+
+
+	/**
+	 * 将广告显示在页面的底部
+	 */
+	public void initAd(){
+		Qhad.showBanner(mLayoutAd,this,  "aa5vaot012", false);
 	}
 
 	public void initIMageLoader() {

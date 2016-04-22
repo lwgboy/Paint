@@ -49,7 +49,6 @@ public class EXRelativeLayout  extends RelativeLayout {
 		mX=event.getX();
 		switch(event.getAction()){
 		case MotionEvent.ACTION_DOWN:
-			//�õ���Ļ���
 			if(Math.abs(mX-getWidth())<10){
 				isContinue=true;
 				DrawView.listenMode=DrawView.SLIDE_MODE;

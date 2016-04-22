@@ -1,7 +1,6 @@
 
 <cn.fjnu.edu.paint.ui.EXRelativeLayout 
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/rlay">
@@ -123,4 +122,9 @@
 	 	          android:contentDescription="@string/mainimg"/>
 	 	         
 	 	  </LinearLayout>
+	<RelativeLayout
+		android:id="@+id/layout_ad"
+		android:layout_width="match_parent"
+		android:layout_height="40dp"
+		android:layout_alignParentBottom="true"/>
 </cn.fjnu.edu.paint.ui.EXRelativeLayout>

@@ -5,10 +5,6 @@
     android:versionCode="15"
     android:versionName="2.9" >
 
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="22" />
-
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     
@@ -18,7 +14,8 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-	<uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.GET_TASKS"/>
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"
@@ -58,34 +55,15 @@
             android:label="@string/apprecom" 
             android:screenOrientation="portrait">
         </activity>
-        <receiver android:name="com.freedoodle.service.DownloadReceiver">
-            <intent-filter >
-                <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
-            </intent-filter>
-        </receiver>
-        
-        
-        <!-- 广告配置,插屏广告 -->
-        <activity android:name="com.gfinsert.gfact"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:excludeFromRecents="true" 
-			android:launchMode="singleInstance"
-			android:configChanges="orientation|keyboardHidden">
-        </activity>
-        
-        <receiver 
-            android:name="com.gfinsert.gfbr">
-            <intent-filter >
-                <action android:name="android.intent.action.PACKAGE_ADDED"/>
-                <data android:scheme="package"/>
-            </intent-filter>
-            <intent-filter >
-                <action android:name="android.net.conn.BACKGROUND_DATA_SETTING_CHANGED"/>
-            </intent-filter>
-        </receiver>
-        
-        <service android:name="com.gfinsert.gfser">    
-        </service>
+
+        <!-- 广告配置页面 -->
+        <service
+            android:name="com.qhad.ads.sdk.service.QhAdService"
+            android:enabled="true"
+            android:exported="false"/>
+        <activity
+            android:name="com.qhad.ads.sdk.adcore.QhAdActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
     </application>
 
 </manifest>

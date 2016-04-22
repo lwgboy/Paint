@@ -1,6 +1,3 @@
-/**
- * 
- */
 package cn.fjnu.edu.paint.adapter;
 
 import android.content.Context;
@@ -58,7 +55,6 @@ public class APPListAdapter extends BaseAdapter {
 	 */
 	@Override
 	public int getCount() {
-		// TODO Auto-generated method stub
 		return appNames.length;
 	}
 
@@ -76,7 +72,6 @@ public class APPListAdapter extends BaseAdapter {
 	 */
 	@Override
 	public long getItemId(int position) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -85,7 +80,6 @@ public class APPListAdapter extends BaseAdapter {
 	 */
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		// TODO Auto-generated method stub
 		View view=createView(position);
 		return view;
 		//return createView(position);
