@@ -160,7 +160,7 @@ public class APPListAdapter extends BaseAdapter {
 				installTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,1.0f/3*viewHeight);
 				installTextView.setGravity(Gravity.CENTER);
 				installTextView.setTextColor(Color.RED);
-				installTextView.setText("安装");
+				installTextView.setText("已安装");
 				viewUtils.addView(installTextView, viewX, viewY, viewWidth, viewHeight);
 				break;
 			}
