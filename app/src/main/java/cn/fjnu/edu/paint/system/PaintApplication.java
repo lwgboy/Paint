@@ -1,4 +1,5 @@
 package cn.fjnu.edu.paint.system;
+
 import java.util.Date;
 import cn.edu.fjnu.utils.OPUtils;
 import cn.edu.fjnu.utils.system.BaseApplication;
@@ -10,7 +11,7 @@ public class PaintApplication extends BaseApplication {
 	@Override
 	public void onCreate() {
 		// TODO Auto-generated method stub
-		super.onCreate();
+		super.onCreate();;
 		Const.appContext=getApplicationContext();
 		String dateNum= Config.getValue(Const.Key.DATE_NUM);
 		//String lastTime=Config.getValue(Const.Key.LAST_TIME);

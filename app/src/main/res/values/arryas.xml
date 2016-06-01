@@ -15,4 +15,9 @@
         <item>cn.edu.fjnu.notebook</item>
         <item>com.fju.zqc.fjuzqcgradutation</item>
     </string-array>
+    <string-array name="downloadURL">
+        <item>http://openbox.mobilem.360.cn/index/d/sid/1928844</item>
+        <item>http://openbox.mobilem.360.cn/index/d/sid/1928844</item>
+        <item>http://openbox.mobilem.360.cn/index/d/sid/3278030</item>
+    </string-array>
 </resources>

@@ -16,7 +16,7 @@ import cn.fjnu.edu.ui.activity.PaintMainActivity;
 /**
  * 
  * @author GaoFei
- *
+ * 贴图适配器
  */
 public class PastePhotoAdapter extends BaseAdapter{
 
@@ -47,13 +47,13 @@ public class PastePhotoAdapter extends BaseAdapter{
 
 	@Override
 	public View getView(int position, View contentView, ViewGroup parentView) {
-		LayoutInflater inflater=(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		LinearLayout linearlayout= (LinearLayout)inflater.inflate(R.layout.paste_img_layout, null);
-		ImageView imageView=(ImageView) linearlayout.findViewById(R.id.displaygridphoto);
+		if(contentView == null)
+			contentView = LayoutInflater.from(context).inflate(R.layout.paste_img_layout, parentView, false);
+		ImageView imageView=(ImageView) contentView.findViewById(R.id.displaygridphoto);
 		imageView.setScaleType(ScaleType.CENTER_INSIDE);
 		imageView.setLayoutParams(new LinearLayout.LayoutParams(PaintMainActivity.screenWidth/10, PaintMainActivity.screenWidth/10));
 		imageView.setImageResource(photoId.get(position));
-		return linearlayout;
+		return contentView;
 	}
 
 }

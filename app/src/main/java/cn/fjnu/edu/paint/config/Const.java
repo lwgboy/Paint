@@ -1,6 +1,7 @@
 package cn.fjnu.edu.paint.config;
 
 import android.content.Context;
+import android.os.Environment;
 
 /**
  *
@@ -14,7 +15,8 @@ public class Const {
 	public static int dateNum;
 	public static long lastTime;
 	public static long currentTime;
-	
+	//应用下载目录
+	public static final String AppDownloadDir = Environment.getExternalStorageDirectory() + "/cn/edu/fjnu/paint/app_download";
 	public static final long ONE_DAY_MILL=24*60*60*1000;
 	public static final String SHARED_NAME="shared_name";
 	public static class Key{
