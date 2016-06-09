@@ -163,13 +163,13 @@ public class DrawView extends ImageView {
         File saveFile = new File(path);
         if (saveFile.exists())
             saveFile.delete();
-        int photoWidth;
-        int photoHeight;
+     //   int photoWidth;
+     //   int photoHeight;
         try {
 
             FileOutputStream fileOutputStream = new FileOutputStream(saveFile);
 
-            if (getWidth() > 480 || getHeight() > 800) {
+/*            if (getWidth() > 480 || getHeight() > 800) {
 
                 float scale = getWidth() / 480f;
                 if (getHeight() / scale <= 800) {
@@ -184,21 +184,20 @@ public class DrawView extends ImageView {
             } else {
                 photoWidth = getWidth();
                 photoHeight = getHeight();
-            }
-            Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.RGB_565);
+            }*/
+            Bitmap bitmap = Bitmap.createBitmap(PaintMainActivity.drawWidth, PaintMainActivity.drawHeight, Bitmap.Config.RGB_565);
             draw(new Canvas(bitmap));
-            Bitmap saveBitmap = Bitmap.createScaledBitmap(bitmap, photoWidth, photoHeight, true);
+            //Bitmap saveBitmap = Bitmap.createScaledBitmap(bitmap, photoWidth, photoHeight, true);
 
-            saveBitmap.compress(CompressFormat.PNG, 50, fileOutputStream);
+            bitmap.compress(CompressFormat.PNG, 50, fileOutputStream);
             fileOutputStream.flush();
             fileOutputStream.close();
             if (mode == SAVE_MODE)
                 Toast.makeText(getContext(), "文件保存在" + path, Toast.LENGTH_SHORT).show();
 
         } catch (Exception e) {
-            // TODO: handle exception
-            Toast.makeText(getContext(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+            Toast.makeText(getContext(), "保存图片发生异常:" + e.getMessage(), Toast.LENGTH_SHORT).show();
+    }
     }
 
 
@@ -543,13 +542,25 @@ public class DrawView extends ImageView {
                                 }
                                 switch (which) {
                                     case 0:
-                                        copyBitmap = Bitmap.createBitmap
-                                                (mBitmap, (int) mX, (int) mY, (int) Math.abs(endX - mX), (int) Math.abs(endY - mY));
-                                        paintMode = COPY_MODE;
+                                        try{
+                                            copyBitmap = Bitmap.createBitmap
+                                                    (mBitmap, (int) mX, (int) mY, (int) Math.abs(endX - mX), (int) Math.abs(endY - mY));
+                                            paintMode = COPY_MODE;
+                                        }catch (Exception e){
+                                            Toast.makeText(getContext(), "未能合理选择区域", Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
                                         break;
                                     case 1:
-                                        copyBitmap = Bitmap.createBitmap
-                                                (mBitmap, (int) mX, (int) mY, (int) Math.abs(endX - mX), (int) Math.abs(endY - mY));
+                                        try{
+                                            copyBitmap = Bitmap.createBitmap
+                                                    (mBitmap, (int) mX, (int) mY, (int) Math.abs(endX - mX), (int) Math.abs(endY - mY));
+                                            paintMode = COPY_MODE;
+                                        }catch (Exception e){
+                                            Toast.makeText(getContext(), "未能合理选择区域", Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
+                                        //copyBitmap = Bitmap.createBitmap(mBitmap, (int) mX, (int) mY, (int) Math.abs(endX - mX), (int) Math.abs(endY - mY));
                                         bmpDrawPath = new DrawPath();
                                         bmpDrawPath.bitmap = copyBitmap;
                                         bmpDrawPath.bitmapType = BitmapType.COMMON_BITMAP;
@@ -565,9 +576,15 @@ public class DrawView extends ImageView {
                                         invalidate();
                                         break;
                                     case 2:
-
-                                        copyBitmap = Bitmap.createBitmap
-                                                (mBitmap, (int) mX, (int) mY, (int) Math.abs(endX - mX), (int) Math.abs(endY - mY));
+                                        try{
+                                            copyBitmap = Bitmap.createBitmap
+                                                    (mBitmap, (int) mX, (int) mY, (int) Math.abs(endX - mX), (int) Math.abs(endY - mY));
+                                            paintMode = COPY_MODE;
+                                        }catch (Exception e){
+                                            Toast.makeText(getContext(), "未能合理选择区域", Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
+                                       // copyBitmap = Bitmap.createBitmap(mBitmap, (int) mX, (int) mY, (int) Math.abs(endX - mX), (int) Math.abs(endY - mY));
                                         bmpDrawPath = new DrawPath();
                                         bmpDrawPath.bitmap = copyBitmap;
                                         bmpDrawPath.bx = mX;
@@ -658,8 +675,15 @@ public class DrawView extends ImageView {
                                         invalidate();
                                         break;
                                     case 4:
-                                        copyBitmap = Bitmap.createBitmap
-                                                (mBitmap, (int) mX, (int) mY, (int) Math.abs(endX - mX), (int) Math.abs(endY - mY));
+                                        try{
+                                            copyBitmap = Bitmap.createBitmap
+                                                    (mBitmap, (int) mX, (int) mY, (int) Math.abs(endX - mX), (int) Math.abs(endY - mY));
+                                            paintMode = COPY_MODE;
+                                        }catch (Exception e){
+                                            Toast.makeText(getContext(), "未能合理选择区域", Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
+                                        //copyBitmap = Bitmap.createBitmap(mBitmap, (int) mX, (int) mY, (int) Math.abs(endX - mX), (int) Math.abs(endY - mY));
                                         bmpDrawPath = new DrawPath();
                                         bmpDrawPath.bitmap = copyBitmap;
                                         bmpDrawPath.oreignBitmapTyep = BitmapType.ROAT_BITMAP;
@@ -672,7 +696,6 @@ public class DrawView extends ImageView {
                                         roatSeekBar.setVisibility(VISIBLE);
                                         roatSeekBar.setProgress(0);
                                         roatSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
                                             @Override
                                             public void onStopTrackingTouch(SeekBar seekBar) {
                                                 lastDrawPath = savePath.get(savePath.size() - 1);
@@ -724,7 +747,7 @@ public class DrawView extends ImageView {
                                         break;
                                     case 5:
                                         final Dialog colorDialog = new Dialog(getContext());
-                                        colorDialog.setTitle("��ɫ��ɫ");
+                                        colorDialog.setTitle("颜色选择");
                                         colorDialog.setContentView(R.layout.dialog_for_selectcolor);
                                         final ColorPicker colorPicker = (ColorPicker) colorDialog.findViewById(R.id.picker);
                                         colorPicker.setColor(getColor());
@@ -738,8 +761,12 @@ public class DrawView extends ImageView {
                                             @Override
                                             public void onClick(View arg0) {
                                                 setCutFillColor(colorPicker.getColor());
-                                                copyBitmap = Bitmap.createBitmap
-                                                        (mBitmap, (int) mX, (int) mY, (int) Math.abs(endX - mX), (int) Math.abs(endY - mY));
+                                                try{
+                                                    copyBitmap = Bitmap.createBitmap(mBitmap, (int) mX, (int) mY, (int) Math.abs(endX - mX), (int) Math.abs(endY - mY));
+                                                }catch (Exception e){
+                                                    Toast.makeText(getContext(), "未能合理选择区域", Toast.LENGTH_SHORT).show();
+                                                    return;
+                                                }
                                                 tempCanvas = new Canvas(copyBitmap);
                                                 tempCanvas.drawColor(cutFillColor);
                                                 mCanvas.drawBitmap(copyBitmap, (int) mX, (int) mY, mBitmapPaint);
@@ -806,9 +833,6 @@ public class DrawView extends ImageView {
             while (iter.hasNext()) {
                 DrawPath drawPath = iter.next();
                 if (drawPath.mode == DRAW_MODE) {
-                    Log.i("mCanvas is null?", "" + (mCanvas == null));
-                    Log.i("drawPath.path is null?", "" + (drawPath.path == null));
-                    Log.i("drawPath.paint is null?", "" + (drawPath.paint == null));
                     mCanvas.drawPath(drawPath.path, drawPath.paint);
                 } else if (drawPath.mode == DRAW_TEXT_MODE) {
                     mCanvas.drawText(drawPath.drawText, drawPath.bx, drawPath.by, drawPath.paint);
@@ -866,6 +890,8 @@ public class DrawView extends ImageView {
     }
 
     public int redo() {
+        if(canclePath == null)
+            return -1;
         if (canclePath.size() < 1)
             return canclePath.size();
 

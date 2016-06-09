@@ -7,16 +7,13 @@
     </string-array>
     <string-array name="appnames">
         <item>涂鸦画图</item>
-        <item>随手记</item>
         <item>美文集</item>
     </string-array>
     <string-array name="packagenames">
         <item>cn.fjnu.edu.paint</item>
-        <item>cn.edu.fjnu.notebook</item>
         <item>com.fju.zqc.fjuzqcgradutation</item>
     </string-array>
     <string-array name="downloadURL">
-        <item>http://openbox.mobilem.360.cn/index/d/sid/1928844</item>
         <item>http://openbox.mobilem.360.cn/index/d/sid/1928844</item>
         <item>http://openbox.mobilem.360.cn/index/d/sid/3278030</item>
     </string-array>

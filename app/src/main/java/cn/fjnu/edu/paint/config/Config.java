@@ -7,7 +7,6 @@ public class Config {
 
 	public static String getValue(String key){
 		SharedPreferences sharedPreferences= Const.appContext.getSharedPreferences(Const.SHARED_NAME, Context.MODE_PRIVATE);
-		//sharedPreferences.get
 		return sharedPreferences.getString(key, "");
 	}
 	

@@ -47,11 +47,16 @@ public class PastePhotoAdapter extends BaseAdapter{
 
 	@Override
 	public View getView(int position, View contentView, ViewGroup parentView) {
-		if(contentView == null)
+		boolean isFirstCreate = false;
+		if(contentView == null){
+			isFirstCreate = true;
 			contentView = LayoutInflater.from(context).inflate(R.layout.paste_img_layout, parentView, false);
+		}
 		ImageView imageView=(ImageView) contentView.findViewById(R.id.displaygridphoto);
-		imageView.setScaleType(ScaleType.CENTER_INSIDE);
-		imageView.setLayoutParams(new LinearLayout.LayoutParams(PaintMainActivity.screenWidth/10, PaintMainActivity.screenWidth/10));
+		if(isFirstCreate){
+			imageView.setScaleType(ScaleType.CENTER_INSIDE);
+			imageView.setLayoutParams(new LinearLayout.LayoutParams(PaintMainActivity.screenWidth/10, PaintMainActivity.screenWidth/10));
+		}
 		imageView.setImageResource(photoId.get(position));
 		return contentView;
 	}

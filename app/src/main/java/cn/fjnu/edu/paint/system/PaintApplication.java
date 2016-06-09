@@ -13,6 +13,10 @@ public class PaintApplication extends BaseApplication {
 		// TODO Auto-generated method stub
 		super.onCreate();;
 		Const.appContext=getApplicationContext();
+		//还原画笔的粗细
+		OPUtils.saveValToSharedpreferences(Const.Key.PEN_COLOR_SIZE, "" + 5);
+		//还原广告渲染
+		//OPUtils.saveValToSharedpreferences(Const.Key.SHOW_AD, "");
 		String dateNum= Config.getValue(Const.Key.DATE_NUM);
 		//String lastTime=Config.getValue(Const.Key.LAST_TIME);
 		if("".equals(dateNum)){

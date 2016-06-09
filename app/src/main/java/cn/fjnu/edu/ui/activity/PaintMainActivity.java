@@ -37,15 +37,18 @@ import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.qhad.ads.sdk.adcore.Qhad;
+import com.qhad.ads.sdk.interfaces.IQhAdEventListener;
 import com.qhad.ads.sdk.interfaces.IQhBannerAd;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import cn.edu.fjnu.utils.OPUtils;
 import cn.fjnu.edu.paint.R;
 import cn.fjnu.edu.paint.adapter.PastePhotoAdapter;
+import cn.fjnu.edu.paint.config.Const;
 import cn.fjnu.edu.paint.data.Shape_Type;
 import cn.fjnu.edu.paint.engine.Background;
 import cn.fjnu.edu.paint.engine.DrawView;
@@ -77,7 +80,7 @@ public class PaintMainActivity extends Activity {
 	private ImageView main_eraserImageView;
 	private ImageView main_backgroundImageView;
 	private ImageView main_drawtypeImageView;
-	private ImageView main_newcreateImageView;
+	private ImageView main_paste_photoImageView;
 	private ImageView main_penImageView;
 	private ImageView main_colorImageView;
 	private SeekBar penSeekBar;
@@ -91,16 +94,12 @@ public class PaintMainActivity extends Activity {
 	private ZoomControls zoomCanvas;
 	private float oreignWidthScalex;
 	private float oreignHeightScalex;
-	private int penProcess = 10;
-	private int orignPenProcess;
+	private int penProcess = 5;
 	public static int drawWidth;
 	public static int drawHeight;
 	public static int screenWidth;
 	public static int screenHeight;
 	public static DrawView canvasView;
-	private int createWidth;
-	private int createHeight;
-	private android.widget.LinearLayout.LayoutParams createLayoutParams;
 	private boolean isBlackColor=false;
 	private String paintText=null;
 	//广告容器页面
@@ -213,7 +212,56 @@ public class PaintMainActivity extends Activity {
 	 * 将广告显示在页面的底部
 	 */
 	public void initAd(){
-		Qhad.showBanner(mLayoutAd,this,  "aa5vaot012", false);
+		if(OPUtils.getValFromSharedpreferences(Const.Key.CLICK_AD).equals("true"))
+			return;
+		final IQhBannerAd iQhBannerAd = Qhad.showBanner(mLayoutAd,this,  "aa5vaot012", false);
+		//广告点击事件
+		iQhBannerAd.setAdEventListener(new IQhAdEventListener() {
+			@Override
+			public void onAdviewGotAdSucceed() {
+
+			}
+
+			@Override
+			public void onAdviewGotAdFail() {
+
+			}
+
+			@Override
+			public void onAdviewRendered() {
+				//此时广告渲染完成
+				//OPUtils.saveValToSharedpreferences(Const.Key.SHOW_AD, "true");
+			}
+
+			@Override
+			public void onAdviewIntoLandpage() {
+
+			}
+
+			@Override
+			public void onAdviewDismissedLandpage() {
+
+			}
+
+			@Override
+			public void onAdviewClicked() {
+				//此时广告被点击,存储被点击的状态
+				OPUtils.saveValToSharedpreferences(Const.Key.CLICK_AD, "true");
+				//关闭广告
+				iQhBannerAd.closeAds();
+				OPUtils.saveValToSharedpreferences(Const.Key.CLICK_AD, "true");
+			}
+
+			@Override
+			public void onAdviewClosed() {
+
+			}
+
+			@Override
+			public void onAdviewDestroyed() {
+
+			}
+		});
 	}
 
 	public void initIMageLoader() {
@@ -389,7 +437,7 @@ public class PaintMainActivity extends Activity {
 			break;
 		case R.id.share:
 			Intent shareIntent = new Intent(Intent.ACTION_SEND);
-			shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+			//shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 			shareIntent.setType("image/*");
 			try {
 				
@@ -417,43 +465,7 @@ public class PaintMainActivity extends Activity {
 					+ "/drawphoto/" + date + ".png";
 			canvansImageView.saveImage(pathString, SAVE_MODE);
 			break;
-		case R.id.zoom_canvans:
-			zoomCanvas.setVisibility(View.VISIBLE);
-			break;
-		case R.id.move_canvans:
-			if (DrawView.isMove) {
-				DrawView.isMove = false;
-				item.setTitle("移动画布");
-			} else {
-				DrawView.isMove = true;
-				item.setTitle("停止移动");
-			}
-			break;
-		case R.id.pastephoto:
-			final Dialog displayPPDialog = new Dialog(this);
-			displayPPDialog.setTitle("选择贴图");
-			displayPPDialog.setContentView(R.layout.pastephoto_layout);
-			GridView photoGridView = (GridView) displayPPDialog.findViewById(R.id.paste_grid);
-			//photoGridView.remove
-			PastePhotoAdapter adapter = new PastePhotoAdapter(PaintMainActivity.this);
-			photoGridView.setAdapter(adapter);
-			photoGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-						@Override
-						public void onItemClick(
-								AdapterView<?> parent,View view, int position, long id) {
-							canvansImageView.setPaintMode(DrawView.COPY_MODE);
-							Bitmap copyBitmap = BitmapFactory.decodeResource(getResources(),(int) id);
-							canvansImageView.setCopyBitmap(copyBitmap);
-							main_penImageView.setBackgroundColor(Color.TRANSPARENT);
-							main_eraserImageView.setBackgroundColor(Color.TRANSPARENT);
-							displayPPDialog.dismiss();
-						}
-
-					});
-			displayPPDialog.show();
-			break;
 		case R.id.closecolor:
-			// ��ʾ��ɫ��ɫѡ��Ի���
 			disClsColDialog();
 			break;
 		case R.id.areaselect:
@@ -462,6 +474,10 @@ public class PaintMainActivity extends Activity {
 			main_eraserImageView.setBackgroundColor(Color.TRANSPARENT);
 			break;
 		case R.id.pastetext:
+			/*if(!OPUtils.isEmpty(OPUtils.getValFromSharedpreferences(Const.Key.SHOW_AD)) && OPUtils.isEmpty(OPUtils.getValFromSharedpreferences(Const.Key.CLICK_AD))){
+				Toast.makeText(getApplicationContext(), "你只需要单击广告一次就可以永久使用本功能", Toast.LENGTH_SHORT).show();
+				return true;
+			}*/
 			final EditText textEditText=new EditText(PaintMainActivity.this);
 			textEditText.setHint("输入自定义名字");
 			new AlertDialog.Builder(PaintMainActivity.this)
@@ -485,6 +501,13 @@ public class PaintMainActivity extends Activity {
 			break;
 		case R.id.moreapp:
 			OPUtils.startActivity(this, RecomActivity.class);
+			break;
+		case R.id.about_ad:
+			new AlertDialog.Builder(this)
+					.setTitle("关于广告")
+					.setMessage("您只需要点击一次即可永久关闭广告")
+					.setPositiveButton("确定", null)
+					.show();
 			break;
 		default:
 			break;
@@ -518,7 +541,7 @@ public class PaintMainActivity extends Activity {
 					"test.jpg");
 			PaintMainActivity.photopath = file.getAbsolutePath();
 			Uri outputFileUri = Uri.fromFile(file);
-			Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);// ����intent�ķ������࣬����Ч�����ã�����ֱ�ӵ���Ӳ������ͷcamera
+			Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 			PaintMainActivity.MActivity.startActivityForResult(intent, 1);
 
@@ -589,6 +612,7 @@ public class PaintMainActivity extends Activity {
 		colorDialog.show();
 	}
 
+	//@TargetApi(Build.VERSION_CODES.M)
 	@SuppressLint({ "ResourceAsColor", "InflateParams" })
 	public void initMainImage() {
 		
@@ -597,8 +621,8 @@ public class PaintMainActivity extends Activity {
 		int singleLength = measureScreenWidth / 8;
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 				singleLength, singleLength);
-		main_newcreateImageView = (ImageView) findViewById(R.id.main_newcreate);
-		main_newcreateImageView.setBackgroundResource(R.drawable.img_state);
+		main_paste_photoImageView = (ImageView) findViewById(R.id.main_paste_photo);
+		main_paste_photoImageView.setBackgroundResource(R.drawable.img_state);
 		
 		main_drawtypeImageView = (ImageView) findViewById(R.id.main_drawfree);
 		main_drawtypeImageView.setBackgroundResource(R.drawable.img_state);
@@ -608,9 +632,9 @@ public class PaintMainActivity extends Activity {
 		main_shapeImageView.setBackgroundResource(R.drawable.img_state);
 		
 		main_penImageView = (ImageView) findViewById(R.id.main_pen);
-		main_penImageView.setBackgroundColor(R.color.selectColor);
-		
-		
+		main_penImageView.setBackgroundColor(Color.parseColor("#5f000000"));
+
+
 		main_colorImageView = (ImageView) findViewById(R.id.main_pencolor);
 		main_colorImageView.setBackgroundResource(R.drawable.img_state);
 		
@@ -622,165 +646,33 @@ public class PaintMainActivity extends Activity {
 		
 		main_clearImageView = (ImageView) findViewById(R.id.main_empty);
 		main_clearImageView.setBackgroundResource(R.drawable.img_state);
-		
-		main_newcreateImageView.setLayoutParams(layoutParams);
-		main_newcreateImageView.setOnClickListener(new View.OnClickListener() {
 
+		main_paste_photoImageView.setLayoutParams(layoutParams);
+		//贴图按钮监听事件
+		main_paste_photoImageView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				new AlertDialog.Builder(PaintMainActivity.this)
-						.setTitle("温馨提示")
-						.setMessage("是否保存当前页面")
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										SimpleDateFormat formatter = new SimpleDateFormat(
-												"yyyy_MM_dd_kk_mm_ss");
-										String date = formatter
-												.format(new java.util.Date());
-										String pathString = Environment
-												.getExternalStorageDirectory()
-												+ "/drawphoto"
-												+ "/"
-												+ date
-												+ ".png";
-										canvansImageView.saveImage(pathString,
-												SAVE_MODE);
-										dialog.dismiss();
-										final Dialog createDialog = new Dialog(
-												PaintMainActivity.this,
-												android.R.style.Theme_Holo_Light_Dialog);
-										createDialog.setTitle("新建画布");
-										createDialog
-												.setContentView(R.layout.new_create_layout);
-										createDialog.show();
-										Button customCanvasButton = (Button) createDialog
-												.getWindow().findViewById(
-														R.id.canvas_ok);
-										customCanvasButton
-												.setOnClickListener(new View.OnClickListener() {
+				final Dialog displayPPDialog = new Dialog(PaintMainActivity.this);
+				displayPPDialog.setTitle("选择贴图");
+				displayPPDialog.setContentView(R.layout.pastephoto_layout);
+				GridView photoGridView = (GridView) displayPPDialog.findViewById(R.id.paste_grid);
+				//photoGridView.remove
+				PastePhotoAdapter adapter = new PastePhotoAdapter(PaintMainActivity.this);
+				photoGridView.setAdapter(adapter);
+				photoGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+					@Override
+					public void onItemClick(
+							AdapterView<?> parent,View view, int position, long id) {
+						canvansImageView.setPaintMode(DrawView.COPY_MODE);
+						Bitmap copyBitmap = BitmapFactory.decodeResource(getResources(),(int) id);
+						canvansImageView.setCopyBitmap(copyBitmap);
+						main_penImageView.setBackgroundColor(Color.TRANSPARENT);
+						main_eraserImageView.setBackgroundColor(Color.TRANSPARENT);
+						displayPPDialog.dismiss();
+					}
 
-													@Override
-													public void onClick(View v) {
-														EditText widthEditText = (EditText) createDialog
-																.getWindow()
-																.findViewById(
-																		R.id.canvas_width);
-														EditText heightEditText = (EditText) createDialog
-																.getWindow()
-																.findViewById(
-																		R.id.canvas_height);
-														if (heightEditText
-																.getText()
-																.toString()
-																.isEmpty())
-															createHeight = mainView
-																	.getHeight();
-														else
-															createHeight = Integer
-																	.parseInt(heightEditText
-																			.getText()
-																			.toString());// ��ȡ����ĸ߶�
-
-														if (widthEditText
-																.getText()
-																.toString()
-																.isEmpty())
-															createWidth = mainView
-																	.getWidth();
-														else
-															createWidth = Integer
-																	.parseInt(widthEditText
-																			.getText()
-																			.toString());// ��ȡ����Ŀ��
-
-														createLayoutParams = new android.widget.LinearLayout.LayoutParams(
-																createWidth,
-																createHeight);
-														canvansImageView
-																.setLayoutParams(createLayoutParams);
-														canvansImageView
-																.setImageResource(R.drawable.whitebackground);
-														isLoad = true;
-														DrawView.isFirstDraw = true;
-														createDialog.dismiss();
-													}
-												});
-
-									}
-								})
-						.setNegativeButton("取消",
-								new DialogInterface.OnClickListener() {
-
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										// TODO Auto-generated method stub
-										dialog.dismiss();
-										final Dialog createDialog = new Dialog(
-												PaintMainActivity.this,
-												android.R.style.Theme_Holo_Light_Dialog);
-										createDialog.setTitle("新建画布");
-										createDialog
-												.setContentView(R.layout.new_create_layout);
-										createDialog.show();
-										Button customCanvasButton = (Button) createDialog
-												.getWindow().findViewById(
-														R.id.canvas_ok);
-										customCanvasButton
-												.setOnClickListener(new View.OnClickListener() {
-
-													@Override
-													public void onClick(View v) {
-														EditText widthEditText = (EditText) createDialog
-																.getWindow()
-																.findViewById(
-																		R.id.canvas_width);
-														EditText heightEditText = (EditText) createDialog
-																.getWindow()
-																.findViewById(
-																		R.id.canvas_height);
-														if (heightEditText
-																.getText()
-																.toString()
-																.isEmpty())
-															createHeight = mainView
-																	.getHeight();
-														else
-															createHeight = Integer
-																	.parseInt(heightEditText
-																			.getText()
-																			.toString());
-
-														if (widthEditText
-																.getText()
-																.toString()
-																.isEmpty())
-															createWidth = mainView
-																	.getWidth();
-														else
-															createWidth = Integer
-																	.parseInt(widthEditText
-																			.getText()
-																			.toString());
-
-														createLayoutParams = new android.widget.LinearLayout.LayoutParams(
-																createWidth,
-																createHeight);
-														canvansImageView
-																.setLayoutParams(createLayoutParams);
-														canvansImageView
-																.setImageResource(R.drawable.whitebackground);
-														isLoad = true;
-														DrawView.isFirstDraw = true;
-														createDialog.dismiss();
-													}
-												});
-									}
-								}).show();
-
+				});
+				displayPPDialog.show();
 			}
 		});
 		main_drawtypeImageView.setLayoutParams(layoutParams);
@@ -841,8 +733,7 @@ public class PaintMainActivity extends Activity {
 											break;
 										}
 										canvansImageView.setCurrentShape();
-										main_penImageView
-												.setBackgroundColor(R.color.selectColor);
+										main_penImageView.setBackgroundColor(Color.parseColor("#5f000000"));
 										if (canvansImageView.getPaintMode() != DrawView.COMMON_MODE) {
 											main_eraserImageView
 													.setBackgroundColor(Color.TRANSPARENT);
@@ -865,70 +756,52 @@ public class PaintMainActivity extends Activity {
 			public void onClick(View v) {
 				setsizeDialog = new Dialog(PaintMainActivity.this);
 				setsizeDialog.setTitle("画笔粗细");
-				setsizeDialog.setContentView(getLayoutInflater().inflate(
-						R.layout.shape_paint, null));
-				setsizeDialog
-						.setOnShowListener(new DialogInterface.OnShowListener() {
-
+				setsizeDialog.setContentView(getLayoutInflater().inflate(R.layout.shape_paint, null));
+				setsizeDialog.setOnShowListener(new DialogInterface.OnShowListener() {
 							@Override
 							public void onShow(DialogInterface dialog) {
-								processImageView.displayPenSize(penSize);
+								processImageView.displayPenSize(Integer.parseInt(OPUtils.getValFromSharedpreferences(Const.Key.PEN_COLOR_SIZE)));
 							}
 						});
-				penTextView = (TextView) setsizeDialog.getWindow()
-						.findViewById(R.id.process_text);
-				processImageView = (DisplayPenSizeView) setsizeDialog
-						.getWindow().findViewById(R.id.pen_shape);
-				// Toast.makeText(MainActivity.this,
-				// ""+processImageView.getWidth(),Toast.LENGTH_SHORT).show();
-				process_okButton = (Button) setsizeDialog.getWindow()
-						.findViewById(R.id.pen_ok);
-				process_cancelButton = (Button) setsizeDialog.getWindow()
-						.findViewById(R.id.pen_cancel);
+				penTextView = (TextView) setsizeDialog.getWindow().findViewById(R.id.process_text);
+				processImageView = (DisplayPenSizeView) setsizeDialog.getWindow().findViewById(R.id.pen_shape);
+				process_okButton = (Button) setsizeDialog.getWindow().findViewById(R.id.pen_ok);
+				process_cancelButton = (Button) setsizeDialog.getWindow().findViewById(R.id.pen_cancel);
 				process_okButton.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						penSize = (int) (0.3 * penProcess + 2);
-						canvansImageView.setPenSize(penSize);
+						OPUtils.saveValToSharedpreferences(Const.Key.PEN_COLOR_SIZE, "" + penProcess);
+						canvansImageView.setPenSize(penProcess);
 						setsizeDialog.dismiss();
 					}
 				});
-				process_cancelButton
-						.setOnClickListener(new View.OnClickListener() {
-
+				process_cancelButton.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								penProcess=orignPenProcess;
 								setsizeDialog.dismiss();
 							}
 						});
-				penSeekBar = (SeekBar) setsizeDialog.getWindow().findViewById(
-						R.id.pen_seekbar);
-				penSeekBar.setProgress(penProcess);
-				penTextView.setText("" + penProcess);
-				penSize = (int) (0.3 * penProcess + 2);
-				penSeekBar
-						.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
+				penSeekBar = (SeekBar) setsizeDialog.getWindow().findViewById(R.id.pen_seekbar);
+				penSeekBar.setMax(50);
+				penSeekBar.setProgress(Integer.parseInt(OPUtils.getValFromSharedpreferences(Const.Key.PEN_COLOR_SIZE)));
+				penTextView.setText(OPUtils.getValFromSharedpreferences(Const.Key.PEN_COLOR_SIZE));
+				penSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 							@Override
 							public void onStopTrackingTouch(SeekBar seekBar) {
 								penProcess = seekBar.getProgress();
-								penSize = (int) (0.3 * penProcess + 2);
-								processImageView.displayPenSize(penSize);
+								processImageView.displayPenSize(penProcess);
 							}
 
 							@Override
 							public void onStartTrackingTouch(SeekBar seekBar) {
-								orignPenProcess=penProcess;
+								//orignPenProcess=penProcess;
 							}
 
 							@Override
 							public void onProgressChanged(SeekBar seekBar,
 									int progress, boolean fromUser) {
 								penTextView.setText("" + progress);
-								// processImageView.set
-								penSize = (int) (0.3 * progress + 2);
-								processImageView.displayPenSize(penSize);
+								processImageView.displayPenSize(progress);
 
 							}
 						});
@@ -940,7 +813,7 @@ public class PaintMainActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				main_penImageView.setBackgroundColor(R.color.selectColor);
+				main_penImageView.setBackgroundColor(Color.parseColor("#5f000000"));
 				if (canvansImageView.getPaintMode() != DrawView.COMMON_MODE) {
 					main_eraserImageView.setBackgroundColor(Color.TRANSPARENT);
 					canvansImageView.setPaintMode(DrawView.COMMON_MODE);
@@ -1017,8 +890,7 @@ public class PaintMainActivity extends Activity {
 				if (canvansImageView.getPaintMode() != DrawView.ERASER_MODE) {
 					main_penImageView.setBackgroundColor(Color.TRANSPARENT);
 					canvansImageView.setPaintMode(DrawView.ERASER_MODE);
-					main_eraserImageView
-							.setBackgroundColor(R.color.selectColor);
+					main_eraserImageView.setBackgroundColor(Color.parseColor("#5f000000"));
 				}
 			}
 		});

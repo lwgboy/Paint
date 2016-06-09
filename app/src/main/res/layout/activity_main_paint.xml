@@ -65,9 +65,9 @@
 	 	      android:layout_height="wrap_content"
 	 	      android:orientation="horizontal">
 	 	      <ImageView 
-	 	          android:id="@+id/main_newcreate"
+	 	          android:id="@+id/main_paste_photo"
 	 	          android:scaleType="fitXY"
-	 	          android:src="@drawable/new_create"
+	 	          android:src="@drawable/paste_photo"
 	 	          android:layout_width="wrap_content"
 	 	          android:layout_height="wrap_content"
 	 	          android:contentDescription="@string/mainimg"/>

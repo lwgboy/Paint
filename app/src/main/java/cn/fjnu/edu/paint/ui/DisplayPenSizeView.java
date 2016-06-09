@@ -20,7 +20,6 @@ public class DisplayPenSizeView extends ImageView {
 	public  Paint mBitmapPaint;
 	public  Paint mPaint;
 	public   int color =Color.GREEN;
-	public  int srokeWidth = 5;
 		public void displayPenSize(int size){
 			
 			mBitmap=Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);

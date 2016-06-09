@@ -21,7 +21,6 @@ import java.io.File;
 
 import cn.fjnu.edu.paint.R;
 import cn.fjnu.edu.paint.adapter.CustomPhotoAdapter;
-import cn.fjnu.edu.ui.activity.MultiPhotoSelectActivity;
 import cn.fjnu.edu.ui.activity.PaintMainActivity;
 public class Background extends Dialog {
 
@@ -29,7 +28,7 @@ public class Background extends Dialog {
 			super(context);
 			setContentView(R.layout.dialog_for_newcreate);
 			ListView listView = (ListView) findViewById(R.id.newlist);
-			String[] way = { "相机", "文件", "自带" ,"拼图"};
+			String[] way = { "相机", "文件", "自带"};
 			ArrayAdapter<String> adapter=new ArrayAdapter<>(context,R.layout.list_text_center,way);
 			listView.setAdapter(adapter);
 			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -92,11 +91,6 @@ public class Background extends Dialog {
 							}
 						});
 						backDialog.show();
-						break;
-					case 3:
-						dismiss();
-						Intent mulIntent=new Intent(PaintMainActivity.MActivity,MultiPhotoSelectActivity.class);
-						PaintMainActivity.MActivity.startActivity(mulIntent);
 						break;
 					}
 				}

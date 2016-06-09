@@ -49,13 +49,19 @@ public class CustomPhotoAdapter extends BaseAdapter{
 
 	@Override
 	public View getView(int position, View contentView, ViewGroup parentView) {
-		LayoutInflater inflater=(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		LinearLayout linearlayout= (LinearLayout)inflater.inflate(R.layout.paste_img_layout, null);
-		ImageView imageView=(ImageView) linearlayout.findViewById(R.id.displaygridphoto);
-		imageView.setScaleType(ScaleType.CENTER_INSIDE);
-		imageView.setLayoutParams(new LinearLayout.LayoutParams(PaintMainActivity.screenWidth/4, LinearLayout.LayoutParams.WRAP_CONTENT));
+		boolean isFirstCreate = false;
+		if(contentView == null){
+			LayoutInflater inflater=(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			contentView = inflater.inflate(R.layout.paste_img_layout, parentView, false);
+			isFirstCreate = true;
+		}
+		ImageView imageView=(ImageView) contentView.findViewById(R.id.displaygridphoto);
+		if(isFirstCreate){
+			imageView.setScaleType(ScaleType.CENTER_INSIDE);
+			imageView.setLayoutParams(new LinearLayout.LayoutParams(PaintMainActivity.screenWidth/4, LinearLayout.LayoutParams.WRAP_CONTENT));
+		}
 		resId=context.getResources().getIdentifier("b"+position,"drawable", context.getPackageName());
 		imageView.setImageResource(resId);
-		return linearlayout;
+		return contentView;
 	}
 }

@@ -121,31 +121,15 @@ public class APPListAdapter extends BaseAdapter {
 		
 		appTextView.setText(appNames[position]);
 		desTextView.setText(desNames[position]);
-		//packageInfos.contains(object)
-		//appTextView.
-		
 		ImageView installImageView=new ImageView(context);
+		installImageView.setId(R.id.install_img);
+		//installImageView.setId(9);
 		viewX=DeviceInfoUtils.getScreenWidth(context)-viewUtils.getViewX(appImageView)-8.0f/5*itemHeight;
 		viewY=viewUtils.getViewY(appImageView);
 		viewHeight=(int)(4.0f/5*itemHeight);
 		viewWidth=2*viewHeight;
 		installImageView.setBackgroundResource(R.drawable.install_state);
 		viewUtils.addView(installImageView, viewX, viewY, viewWidth, viewHeight);
-		installImageView.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				Uri uri=Uri.parse("market://search?q=pname:"+packNames[position]);
-				Intent intent=new Intent(Intent.ACTION_VIEW);
-				intent.setData(uri);
-				
-				PackageManager pManager=context.getPackageManager();
-				if(intent.resolveActivity(pManager)!=null)
-					context.startActivity(intent);
-			}
-		});
-		
 		
 		//OPUtils.showToast(packageInfos.toString(), Toast.LENGTH_SHORT);
 		for(PackageInfo packageInfo:packageInfos){

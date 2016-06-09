@@ -25,6 +25,9 @@ public class Const {
 		public static final String UPDATE_TIP ="update_tip";
 		public static final String DOWNLOAD_ID ="download_id";
 		public static final String APP_INSTALL_TIME ="app_instanll_time";
+		public static final String PEN_COLOR_SIZE = "pen_color_size";
+		public static final String CLICK_AD = "click_ad";
+		public static final String SHOW_AD = "show_ad";
 	}
 	
 	

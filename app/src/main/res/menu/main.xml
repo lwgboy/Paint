@@ -12,28 +12,19 @@
 	    android:icon="@drawable/reply"
 	    android:showAsAction="always"
 	    android:title="@string/reply"/>
+
+	<item
+		android:id="@+id/save"
+		android:icon="@drawable/save"
+		android:showAsAction="always"
+		android:title="@string/save"/>
+
 	<item 
 	    android:id="@+id/share"
 	    android:icon="@drawable/share"
-	    android:showAsAction="always"
+	    android:showAsAction="ifRoom"
 	    android:title="@string/share"/>
-	<item 
-	    android:id="@+id/save"
-	    android:icon="@drawable/save"
-	    android:showAsAction="always"
-	    android:title="@string/save"/>
-	<item 
-	    android:id="@+id/zoom_canvans"
-	    android:showAsAction="ifRoom"
-	    android:title="@string/zoomcanvans"/>
-	<item 
-	    android:id="@+id/move_canvans"
-	    android:showAsAction="ifRoom"
-	    android:title="@string/movecanvas"/>
-	<item 
-    	android:id="@+id/pastephoto"
-    	android:showAsAction="ifRoom"
-    	android:title="@string/pastephoto"/>
+
 	<item 
     	android:id="@+id/closecolor"
     	android:showAsAction="ifRoom"
@@ -50,4 +41,8 @@
     	android:id="@+id/moreapp"
     	android:showAsAction="ifRoom"
     	android:title="@string/apprecom"/>
+	<item
+		android:id="@+id/about_ad"
+		android:showAsAction="ifRoom"
+		android:title="@string/about_ad"/>
 </menu>

@@ -53,4 +53,5 @@
        <string name="blackcolor">黑色</string>
        <string name="pastetext">黏贴文字</string>
        <string name="apprecom">应用推荐</string>
+    <string name="about_ad">关于广告</string>
 </resources>
