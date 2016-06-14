@@ -1,5 +1,4 @@
 package cn.fjnu.edu.ui.activity;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,12 +20,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;
+
 import cn.edu.fjnu.utils.PackageUtils;
 import cn.edu.fjnu.utils.ViewUtils;
 import cn.fjnu.edu.paint.R;
 import cn.fjnu.edu.paint.adapter.APPListAdapter;
 import cn.fjnu.edu.paint.config.Const;
-public class RecomActivity extends Activity {
+public class RecomActivity extends AppBaseActivity {
 
 	private ViewUtils viewUtils;
 	private ListView appListView;

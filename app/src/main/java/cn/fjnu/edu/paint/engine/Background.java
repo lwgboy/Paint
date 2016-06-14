@@ -25,7 +25,7 @@ import cn.fjnu.edu.ui.activity.PaintMainActivity;
 public class Background extends Dialog {
 
 		public Background(Context context, int theme) {
-			super(context);
+			super(context, theme);
 			setContentView(R.layout.dialog_for_newcreate);
 			ListView listView = (ListView) findViewById(R.id.newlist);
 			String[] way = { "相机", "文件", "自带"};

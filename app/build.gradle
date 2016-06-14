@@ -10,8 +10,10 @@ android {
         targetSdkVersion 23
     }
 
+    lintOptions{
+        checkReleaseBuilds false
+    }
     buildTypes {
-
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -23,5 +25,8 @@ dependencies {
     compile files('libs/androidutil.jar')
     compile files('libs/universal-image-loader-1.6.1-with-src.jar')
     compile files('libs/qhad_0.1.12.1113.jar')
-    compile 'com.android.support:support-v4:23.4.0'
+    compile 'com.nineoldandroids:library:2.4.+'
+    compile 'com.github.navasmdc:MaterialDesign:1.5@aar'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.nightonke:boommenu:1.0.9'
 }

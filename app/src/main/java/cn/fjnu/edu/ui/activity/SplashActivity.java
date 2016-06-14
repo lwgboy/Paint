@@ -1,6 +1,5 @@
 package cn.fjnu.edu.ui.activity;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -15,7 +14,7 @@ import android.widget.TextView;
 
 import cn.fjnu.edu.paint.R;
 
-public class SplashActivity extends Activity {
+public class SplashActivity extends AppBaseActivity {
 	private LinearLayout ll_splash_main = null;
 	private TextView tv_splash_version = null;
 	private String versionText = null;
@@ -28,7 +27,6 @@ public class SplashActivity extends Activity {
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
 			loadMainUI();
-
 		}
 
 	};
@@ -37,7 +35,7 @@ public class SplashActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		super.setContentView(R.layout.splash);
+		setContentView(R.layout.splash);
 		ll_splash_main = (LinearLayout) findViewById(R.id.ll_splash_main);
 		tv_splash_version = (TextView)findViewById(R.id.tv_splash_version);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,

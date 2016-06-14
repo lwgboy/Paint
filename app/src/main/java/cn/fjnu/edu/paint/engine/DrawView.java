@@ -15,8 +15,8 @@ import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -526,7 +526,7 @@ public class DrawView extends ImageView {
                 mPath = null;
                 break;
             case CUT_MODE:
-                new AlertDialog.Builder(getContext())
+                AlertDialog alertDialog = new AlertDialog.Builder(getContext(), android.R.style.Theme_Holo_Light_Dialog)
                         .setTitle("操作方式")
                         .setItems(new String[]{"复制", "剪切", "缩放", "删除", "旋转", "填色"}, new DialogInterface.OnClickListener() {
                             @Override
@@ -796,8 +796,9 @@ public class DrawView extends ImageView {
                                 }
                                 dialog.dismiss();
                             }
-                        })
-                        .show();
+                        }).create();
+                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                alertDialog.show();
                 mPath.reset();
                 mPath = null;
                 break;

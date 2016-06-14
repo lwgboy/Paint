@@ -1,9 +1,9 @@
-
-<cn.fjnu.edu.paint.ui.EXRelativeLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/rlay">
+<cn.fjnu.edu.paint.ui.EXRelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	xmlns:app="http://schemas.android.com/tools"
+	android:id="@+id/rlay">
 	<cn.fjnu.edu.paint.ui.DrawScrollView
 	    android:scrollbarSize="10dp"
 	    android:id="@+id/scrollview"
@@ -59,72 +59,21 @@
 	         android:layout_alignParentBottom="true"
 	         android:layout_marginBottom="60dp"
 	         />
-	 	  <LinearLayout 
-	 	      android:layout_alignParentTop="true"
-	 	      android:layout_width="match_parent"
-	 	      android:layout_height="wrap_content"
-	 	      android:orientation="horizontal">
-	 	      <ImageView 
-	 	          android:id="@+id/main_paste_photo"
-	 	          android:scaleType="fitXY"
-	 	          android:src="@drawable/paste_photo"
-	 	          android:layout_width="wrap_content"
-	 	          android:layout_height="wrap_content"
-	 	          android:contentDescription="@string/mainimg"/>
-	 	       <ImageView 
-	 	           android:id="@+id/main_drawfree"
-	 	           android:scaleType="fitXY"
-	 	          android:src="@drawable/draw_free"
-	 	          android:layout_width="wrap_content"
-	 	          android:layout_height="wrap_content"
-	 	          android:contentDescription="@string/mainimg"/>
-	 	        <ImageView 
-	 	            android:id="@+id/main_pen"
-	 	            android:scaleType="fitXY"
-	 	          android:src="@drawable/pen"
-	 	          android:layout_width="wrap_content"
-	 	          android:layout_height="wrap_content"
-	 	          android:contentDescription="@string/mainimg"/>
-	 	          <ImageView 
-	 	              android:id="@+id/main_pensize"
-	 	              android:scaleType="fitXY"
-	 	          android:src="@drawable/pensize"
-	 	          android:layout_width="wrap_content"
-	 	          android:layout_height="wrap_content"
-	 	          android:contentDescription="@string/mainimg"/>
-	 	         <ImageView 
-	 	             android:id="@+id/main_background"
-	 	             android:scaleType="fitXY"
-	 	          android:src="@drawable/background"
-	 	          android:layout_width="wrap_content"
-	 	          android:layout_height="wrap_content"
-	 	          android:contentDescription="@string/mainimg"/>
-	 	          <ImageView 
-	 	              android:id="@+id/main_eraser"
-	 	              android:scaleType="fitXY"
-	 	          android:src="@drawable/eraser"
-	 	          android:layout_width="wrap_content"
-	 	          android:layout_height="wrap_content"
-	 	          android:contentDescription="@string/mainimg"/>
-	 	           <ImageView 
-	 	               android:id="@+id/main_pencolor"
-	 	               android:scaleType="fitXY"
-	 	          android:src="@drawable/pencolor"
-	 	          android:layout_width="wrap_content"
-	 	          android:layout_height="wrap_content"
-	 	          android:contentDescription="@string/mainimg"/>
-	 	            <ImageView 
-	 	                android:id="@+id/main_empty"
-	 	                android:scaleType="fitXY"
-	 	          android:src="@drawable/empty"
-	 	          android:layout_width="wrap_content"
-	 	          android:layout_height="wrap_content"
-	 	          android:contentDescription="@string/mainimg"/>
-	 	         
-	 	  </LinearLayout>
 	<RelativeLayout
 		android:id="@+id/layout_ad"
 		android:layout_width="match_parent"
 		android:layout_height="40dp"
 		android:layout_alignParentBottom="true"/>
+
+	<com.nightonke.boommenu.BoomMenuButton
+		android:id="@+id/btn_boom_main"
+		android:layout_alignParentRight="true"
+		android:layout_alignParentEnd="true"
+		android:layout_margin="24dp"
+		android:layout_above="@+id/layout_ad"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		app:boom_inActionBar="false"
+		app:boom_button_color="#11cd6e"
+		app:boom_button_pressed_color="#af11cd6e"/>
 </cn.fjnu.edu.paint.ui.EXRelativeLayout>
