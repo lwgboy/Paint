@@ -39,7 +39,6 @@ import cn.fjnu.edu.paint.ui.ColorPicker;
 import cn.fjnu.edu.paint.ui.OpacityBar;
 import cn.fjnu.edu.ui.activity.PaintMainActivity;
 
-
 @SuppressLint("ClickableViewAccessibility")
 public class DrawView extends ImageView {
 
@@ -163,32 +162,10 @@ public class DrawView extends ImageView {
         File saveFile = new File(path);
         if (saveFile.exists())
             saveFile.delete();
-     //   int photoWidth;
-     //   int photoHeight;
         try {
-
             FileOutputStream fileOutputStream = new FileOutputStream(saveFile);
-
-/*            if (getWidth() > 480 || getHeight() > 800) {
-
-                float scale = getWidth() / 480f;
-                if (getHeight() / scale <= 800) {
-                    photoWidth = 480;
-                    photoHeight = (int) (getHeight() / scale);
-                } else {
-                    scale = getHeight() / 800;
-                    photoHeight = 800;
-                    photoWidth = (int) (getWidth() / scale);
-                }
-
-            } else {
-                photoWidth = getWidth();
-                photoHeight = getHeight();
-            }*/
             Bitmap bitmap = Bitmap.createBitmap(PaintMainActivity.drawWidth, PaintMainActivity.drawHeight, Bitmap.Config.RGB_565);
             draw(new Canvas(bitmap));
-            //Bitmap saveBitmap = Bitmap.createScaledBitmap(bitmap, photoWidth, photoHeight, true);
-
             bitmap.compress(CompressFormat.PNG, 50, fileOutputStream);
             fileOutputStream.flush();
             fileOutputStream.close();

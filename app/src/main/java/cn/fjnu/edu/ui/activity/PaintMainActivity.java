@@ -412,14 +412,16 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
                 //shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
                 shareIntent.setType("image/*");
                 try {
-
                     SimpleDateFormat formatter = new SimpleDateFormat(
                             "yyyy_MM_dd_kk_mm_ss");
                     String date = formatter.format(new java.util.Date());
-                    String pathString = Environment.getExternalStorageDirectory()
-                            + "/drawphoto/" + date + ".png";
-                    canvansImageView.saveImage(pathString, SHARE_MODE);
-                    Uri uri = Uri.fromFile(new File(pathString));
+                    String dirPath = Environment.getExternalStorageDirectory() + "/drawphoto";
+                    File dirFile = new File(dirPath);
+                    if(!dirFile.exists())
+                        dirFile.mkdirs();
+                    File pathFile = new File(dirFile, date+".png");
+                    canvansImageView.saveImage(pathFile.getAbsolutePath(), SHARE_MODE);
+                    Uri uri = Uri.fromFile(pathFile);
                     shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
                     PaintMainActivity.this.startActivity(Intent.createChooser(
                             shareIntent, "请选择"));
@@ -433,9 +435,12 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
                 SimpleDateFormat formatter = new SimpleDateFormat(
                         "yyyy_MM_dd_kk_mm_ss");
                 String date = formatter.format(new java.util.Date());
-                String pathString = Environment.getExternalStorageDirectory()
-                        + "/drawphoto/" + date + ".png";
-                canvansImageView.saveImage(pathString, SAVE_MODE);
+                String dirPath = Environment.getExternalStorageDirectory() + "/drawphoto";
+                File dirFile = new File(dirPath);
+                if(!dirFile.exists())
+                    dirFile.mkdirs();
+                File pathFile = new File(dirFile, date+".png");
+                canvansImageView.saveImage(pathFile.getAbsolutePath(), SAVE_MODE);
                 break;
             case R.id.closecolor:
                 disClsColDialog();
@@ -457,6 +462,11 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        return super.onMenuOpened(featureId, menu);
     }
 
     public ZoomControls getZoomCanvans() {
@@ -541,6 +551,7 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
                 .subButtonsShadow(Util.getInstance().dp2px(2), Util.getInstance().dp2px(2))
                 .onSubButtonClick(this)
                 .init(mButtonMenuMain);
+
     }
 
     @Override
@@ -791,4 +802,5 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
                 break;
         }
     }
+
 }
