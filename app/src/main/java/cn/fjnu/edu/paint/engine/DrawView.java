@@ -174,7 +174,7 @@ public class DrawView extends ImageView {
 
         } catch (Exception e) {
             Toast.makeText(getContext(), "保存图片发生异常:" + e.getMessage(), Toast.LENGTH_SHORT).show();
-    }
+        }
     }
 
 

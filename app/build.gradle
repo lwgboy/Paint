@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "cn.fjnu.edu.paint"
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 22
     }
 
     lintOptions{
@@ -24,7 +24,6 @@ android {
 dependencies {
     compile files('libs/androidutil.jar')
     compile files('libs/universal-image-loader-1.6.1-with-src.jar')
-    compile files('libs/qhad_0.1.12.1113.jar')
     compile 'com.nineoldandroids:library:2.4.+'
     compile 'com.github.navasmdc:MaterialDesign:1.5@aar'
     compile 'com.android.support:appcompat-v7:23.4.0'

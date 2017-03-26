@@ -40,10 +40,6 @@ import com.nightonke.boommenu.Types.BoomType;
 import com.nightonke.boommenu.Types.ButtonType;
 import com.nightonke.boommenu.Types.PlaceType;
 import com.nightonke.boommenu.Util;
-import com.qhad.ads.sdk.adcore.Qhad;
-import com.qhad.ads.sdk.interfaces.IQhAdEventListener;
-import com.qhad.ads.sdk.interfaces.IQhBannerAd;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
@@ -117,7 +113,7 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
         //初始化主功能
         initMain();
         //初始化广告
-        initAd();
+        //initAd();
         canvansImageView.setImageResource(R.drawable.app_rm);
     }
 
@@ -214,61 +210,6 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
     }
 
 
-    /**
-     * 将广告显示在页面的底部
-     */
-    public void initAd() {
-        if (OPUtils.getValFromSharedpreferences(Const.Key.CLICK_AD).equals("true"))
-            return;
-        final IQhBannerAd iQhBannerAd = Qhad.showBanner(mLayoutAd, this, "aa5vaot012", false);
-        //广告点击事件
-        iQhBannerAd.setAdEventListener(new IQhAdEventListener() {
-            @Override
-            public void onAdviewGotAdSucceed() {
-
-            }
-
-            @Override
-            public void onAdviewGotAdFail() {
-
-            }
-
-            @Override
-            public void onAdviewRendered() {
-                //此时广告渲染完成
-                //OPUtils.saveValToSharedpreferences(Const.Key.SHOW_AD, "true");
-            }
-
-            @Override
-            public void onAdviewIntoLandpage() {
-
-            }
-
-            @Override
-            public void onAdviewDismissedLandpage() {
-
-            }
-
-            @Override
-            public void onAdviewClicked() {
-                //此时广告被点击,存储被点击的状态
-                OPUtils.saveValToSharedpreferences(Const.Key.CLICK_AD, "true");
-                //关闭广告
-                iQhBannerAd.closeAds();
-                OPUtils.saveValToSharedpreferences(Const.Key.CLICK_AD, "true");
-            }
-
-            @Override
-            public void onAdviewClosed() {
-
-            }
-
-            @Override
-            public void onAdviewDestroyed() {
-
-            }
-        });
-    }
 
 
     @Override
@@ -451,13 +392,6 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
             case R.id.moreapp:
                 OPUtils.startActivity(this, RecomActivity.class);
                 break;
-            case R.id.about_ad:
-                new AlertDialog.Builder(this)
-                        .setTitle("关于广告")
-                        .setMessage("您只需要点击一次即可永久关闭广告")
-                        .setPositiveButton("确定", null)
-                        .show();
-                break;
             default:
                 break;
         }
@@ -543,10 +477,9 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
         new BoomMenuButton.Builder()
                 .subButtons(mainDrawables, mainColors, contents)
                 .button(ButtonType.CIRCLE)
-                .boom(BoomType.LINE)
+                .boom(BoomType.HORIZONTAL_THROW)
                 .place(PlaceType.CIRCLE_9_1)
                 .animator(this)
-                .duration(500)
                 .boomButtonShadow(Util.getInstance().dp2px(2), Util.getInstance().dp2px(2))
                 .subButtonsShadow(Util.getInstance().dp2px(2), Util.getInstance().dp2px(2))
                 .onSubButtonClick(this)

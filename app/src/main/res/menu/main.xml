@@ -38,8 +38,5 @@
         android:id="@+id/moreapp"
         app:showAsAction="ifRoom"
         android:title="@string/apprecom"/>
-    <item
-        android:id="@+id/about_ad"
-        app:showAsAction="ifRoom"
-        android:title="@string/about_ad"/>
+
 </menu>
