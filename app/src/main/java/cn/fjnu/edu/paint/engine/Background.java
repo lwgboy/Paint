@@ -21,6 +21,8 @@ import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.utils.StorageUtils;
+
 import java.io.File;
 import java.util.List;
 import java.util.UUID;
@@ -47,7 +49,7 @@ public class Background extends Dialog {
 					case 0:
 						try{
 							PaintMainActivity.photopath = Environment.getExternalStorageDirectory() + File.separator + UUID.randomUUID().toString() + ".jpg";
-							Uri uri = FileProvider.getUriForFile(context, "cn.fjnu.edu.paint.fileprovider", new File(PaintMainActivity.photopath));
+                            Uri uri = FileProvider.getUriForFile(context, "cn.fjnu.edu.paint.fileprovider", new File(PaintMainActivity.photopath));
 							Intent intent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 							List<ResolveInfo> resolveInfos = context.getPackageManager().queryIntentActivities(intent, 0);
 							if(resolveInfos == null || resolveInfos.size() == 0){
