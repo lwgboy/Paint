@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,13 +19,15 @@ import android.widget.GridView;
 import android.widget.ListView;
 
 import java.io.File;
+import java.util.UUID;
 
+import cn.edu.fjnu.utils.DeviceInfoUtils;
 import cn.fjnu.edu.paint.R;
 import cn.fjnu.edu.paint.adapter.CustomPhotoAdapter;
 import cn.fjnu.edu.ui.activity.PaintMainActivity;
 public class Background extends Dialog {
 
-		public Background(Context context, int theme) {
+		public Background(final Context context, int theme) {
 			super(context, theme);
 			setContentView(R.layout.dialog_for_newcreate);
 			ListView listView = (ListView) findViewById(R.id.newlist);
@@ -39,11 +42,10 @@ public class Background extends Dialog {
 					switch(position){
 					case 0:
 						try{
-							File file=new File(Environment.getExternalStorageDirectory(),"test.jpg");
-							Uri outPutUri=Uri.fromFile(file);
-							PaintMainActivity.photopath=file.getAbsolutePath();
+							PaintMainActivity.photopath = Environment.getExternalStorageDirectory() + File.separator + UUID.randomUUID().toString() + ".jpg";
+							Uri uri = FileProvider.getUriForFile(context, "cn.fjnu.edu.paint.fileprovider", new File(PaintMainActivity.photopath));
 							Intent intent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-							intent.putExtra(MediaStore.EXTRA_OUTPUT, outPutUri);
+							intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
 							PaintMainActivity.MActivity.startActivityForResult(intent, 1);
 						}
 						catch(Exception e){
@@ -63,12 +65,10 @@ public class Background extends Dialog {
 						GridView gridView;
 						final Dialog backDialog=new Dialog(getContext(), android.R.style.Theme_Holo_Light_Dialog);
 						backDialog.setTitle("选择背景图");
-						backDialog.setContentView(R.layout.pastephoto_layout);
-						gridView=(GridView)backDialog.findViewById(R.id.paste_grid);
+						backDialog.setContentView(R.layout.background);
+						gridView=(GridView)backDialog.findViewById(R.id.grid_background);
 						gridView.setGravity(Gravity.CENTER);
-						gridView.setColumnWidth(PaintMainActivity.screenWidth/3);
-						gridView.setHorizontalSpacing(5);
-						gridView.setVerticalSpacing(5);
+						gridView.setColumnWidth(DeviceInfoUtils.getScreenWidth(context)/3);
 						CustomPhotoAdapter customPhotoAdapter=new CustomPhotoAdapter(PaintMainActivity.MActivity);
 						gridView.setAdapter(customPhotoAdapter);
 						gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

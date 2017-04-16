@@ -2,21 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.fjnu.edu.paint"
     android:installLocation="auto"
-    android:versionCode="24"
-    android:versionName="3.8" >
+    android:versionCode="25"
+    android:versionName="4.0" >
 
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    
-    <!-- 广告权限 -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <!-- <uses-permission android:name="android.permission.GET_TASKS"/> -->
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"
@@ -51,15 +42,16 @@
             android:label="@string/apprecom" 
             android:screenOrientation="portrait">
         </activity>
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="cn.fjnu.edu.paint.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/share_file_paths" />
+        </provider>
 
-        <!-- 广告配置页面 -->
-        <service
-            android:name="com.qhad.ads.sdk.service.QhAdService"
-            android:enabled="true"
-            android:exported="false"/>
-        <activity
-            android:name="com.qhad.ads.sdk.adcore.QhAdActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"/>
     </application>
 
 </manifest>

@@ -63,7 +63,6 @@ public class APPListAdapter extends BaseAdapter {
 	 */
 	@Override
 	public Object getItem(int position) {
-		// TODO Auto-generated method stub
 		return appNames[position];
 	}
 
@@ -131,9 +130,7 @@ public class APPListAdapter extends BaseAdapter {
 		installImageView.setBackgroundResource(R.drawable.install_state);
 		viewUtils.addView(installImageView, viewX, viewY, viewWidth, viewHeight);
 		
-		//OPUtils.showToast(packageInfos.toString(), Toast.LENGTH_SHORT);
 		for(PackageInfo packageInfo:packageInfos){
-			//Log.i("packName",packageInfo.packageName);
 			if(packageInfo.packageName.equals(packNames[position])){
 				viewUtils.removeView(installImageView);
 				TextView installTextView=new TextView(context);

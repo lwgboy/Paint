@@ -65,15 +65,13 @@
 		android:layout_height="40dp"
 		android:layout_alignParentBottom="true"/>
 
-	<com.nightonke.boommenu.BoomMenuButton
-		android:id="@+id/btn_boom_main"
+	<ImageView
+		android:id="@+id/img_show_op"
 		android:layout_alignParentRight="true"
 		android:layout_alignParentEnd="true"
 		android:layout_margin="24dp"
 		android:layout_above="@+id/layout_ad"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		app:boom_inActionBar="false"
-		app:boom_button_color="#11cd6e"
-		app:boom_button_pressed_color="#af11cd6e"/>
+		android:layout_width="64dp"
+		android:layout_height="64dp"
+		android:src="@drawable/show_op"/>
 </cn.fjnu.edu.paint.ui.EXRelativeLayout>

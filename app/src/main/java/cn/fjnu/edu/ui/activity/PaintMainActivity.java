@@ -1,8 +1,10 @@
 package cn.fjnu.edu.ui.activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.bluetooth.BluetoothClass;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -12,12 +14,14 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -29,22 +33,17 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ZoomControls;
-
-import com.nightonke.boommenu.BoomMenuButton;
-import com.nightonke.boommenu.Types.BoomType;
-import com.nightonke.boommenu.Types.ButtonType;
-import com.nightonke.boommenu.Types.PlaceType;
-import com.nightonke.boommenu.Util;
+import android.content.pm.PackageManager;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.Random;
-
 import cn.edu.fjnu.utils.DeviceInfoUtils;
 import cn.edu.fjnu.utils.OPUtils;
 import cn.fjnu.edu.paint.R;
@@ -56,9 +55,11 @@ import cn.fjnu.edu.paint.engine.DrawView;
 import cn.fjnu.edu.paint.ui.ColorPicker;
 import cn.fjnu.edu.paint.ui.DisplayPenSizeView;
 import cn.fjnu.edu.paint.ui.OpacityBar;
+import cn.fjnu.edu.paint.view.OpDialog;
+import cn.fjnu.edu.paint.view.PastePhotoDialog;
 
 @SuppressLint("SimpleDateFormat")
-public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton.OnSubButtonClickListener,BoomMenuButton.AnimatorListener{
+public class PaintMainActivity extends AppBaseActivity{
 
     private static final String TAG = "PaintMainActivity";
     public static final int SHARE_MODE = 0;
@@ -72,14 +73,14 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
     public static boolean isReduce = false;
     public static boolean isLoad = true;
     public boolean isMeasure = true;
-    private final int DEFAULT_WIDTH = 480;
-    private final int DEFAULT_HEIGHT = 800;
+    private  int DEFAULT_WIDTH = 480;
+    private  int DEFAULT_HEIGHT = 800;
     private int opacity = 0xff;
     private DrawView canvansImageView;
     private SeekBar penSeekBar;
     private TextView penTextView;
     private DisplayPenSizeView processImageView;
-    private BoomMenuButton mButtonMenuMain;
+    private ImageView mImgShowOp;
     private boolean isInitMain = false;
     private int penSize;
     private Button process_okButton;
@@ -100,21 +101,25 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
     private String[] mColors = {"#F44336", "#E91E63", "#9C27B0", "#2196F3", "#03A9F4", "#00BCD4",
             "#009688", "#4CAF50", "#8BC34A", "#CDDC39", "#FFEB3B", "#FFC107", "#FF9800", "#FF5722",
             "#795548", "#9E9E9E", "#607D8B"};
-
+    private static final int REQUEST_STORAGE_PERMISSION_CODE = 1;
     //广告容器页面
     private RelativeLayout mLayoutAd;
+    private OpDialog mOpDialog;
+    private PastePhotoDialog mPastePhotoDialog;
+    private Dialog mTextInputDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_paint);
         Log.i(TAG, "after setContentView");
+        checkPermission();
         init();
         //初始化主功能
         initMain();
         //初始化广告
         //initAd();
-        canvansImageView.setImageResource(R.drawable.app_rm);
+        //canvansImageView.setImageResource(R.drawable.app_rm);
     }
 
 
@@ -125,14 +130,25 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode == REQUEST_STORAGE_PERMISSION_CODE){
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+            }else{
+                showStorageRequestPermission();
+            }
+
+        }
+    }
+
+    @Override
     public void onWindowFocusChanged(boolean hasFocus) {
+        Log.i(TAG, "onWindowFocusChaned->hasFocus:" + hasFocus);
         super.onWindowFocusChanged(hasFocus);
         if (isLoad) {
             drawWidth = mainView.getWidth();
             drawHeight = mainView.getHeight();
-            canvansImageView
-                    .setLayoutParams(new android.widget.LinearLayout.LayoutParams(
-                            mainView.getWidth(), mainView.getHeight()));
+            canvansImageView.setLayoutParams(new android.widget.LinearLayout.LayoutParams(mainView.getWidth(), mainView.getHeight()));
             canvansImageView.setImageResource(R.drawable.whitebackground);
             isLoad = false;
             if (isMeasure) {
@@ -146,7 +162,228 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
     }
 
     public void init() {
-        mButtonMenuMain = (BoomMenuButton) findViewById(R.id.btn_boom_main);
+        DEFAULT_WIDTH = DeviceInfoUtils.getScreenWidth(this) / 2;
+        DEFAULT_HEIGHT = DeviceInfoUtils.getScreenHeight(this) / 2;
+        mImgShowOp = (ImageView) findViewById(R.id.img_show_op);
+        canvansImageView = (DrawView) findViewById(R.id.img_canvans);
+        mImgShowOp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mOpDialog == null)
+                   mOpDialog = new OpDialog(PaintMainActivity.this, new OpDialog.Callback() {
+                       @Override
+                       public void onClick(int index) {
+                           switch (index){
+                               case 0:
+                                   if(mPastePhotoDialog == null)
+                                       mPastePhotoDialog = new PastePhotoDialog(PaintMainActivity.this, canvansImageView);
+                                   mPastePhotoDialog.show();
+                                   break;
+                               case 1:
+                                   AlertDialog alertDialog = new AlertDialog.Builder(PaintMainActivity.this, android.R.style.Theme_Holo_Light_Dialog)
+                                           .setTitle("选择绘图类型")
+                                           .setSingleChoiceItems(
+                                                   new String[]{"直线", "折线", "矩形",
+                                                           "六边形", "椭圆", "自由手绘"},
+                                                   canvansImageView.getCurrentShape(),
+                                                   new DialogInterface.OnClickListener() {
+
+                                                       @Override
+                                                       public void onClick(DialogInterface dialog,
+                                                                           int which) {
+                                                           switch (which) {
+
+                                                               case Shape_Type.STRAIGIT:
+                                                                   canvansImageView
+                                                                           .setShape(Shape_Type.STRAIGIT);
+                                                                   break;
+                                                               case Shape_Type.BROKEN:
+                                                                   canvansImageView.setShape(Shape_Type.BROKEN);
+                                                                   break;
+                                                               case Shape_Type.RECT:
+                                                                   canvansImageView
+                                                                           .setShape(Shape_Type.RECT);
+                                                                   break;
+                                                               case Shape_Type.MUTIL:
+                                                                   canvansImageView.setShape(Shape_Type.MUTIL);
+                                                                   break;
+                                                               case Shape_Type.OVAL:
+                                                                   canvansImageView.setShape(Shape_Type.OVAL);
+                                                                   break;
+                                                               case Shape_Type.FREE:
+                                                                   canvansImageView
+                                                                           .setShape(Shape_Type.FREE);
+                                                                   break;
+                                                               default:
+                                                                   break;
+                                                           }
+                                                           canvansImageView.setCurrentShape();
+                                                           if (canvansImageView.getPaintMode() != DrawView.COMMON_MODE) {
+                                                               // fillcolorImageView.setBackgroundColor(Color.TRANSPARENT);
+                                                               // cutImageView.setBackgroundColor(Color.TRANSPARENT);
+                                                               canvansImageView.setPaintMode(DrawView.COMMON_MODE);
+                                                           }
+
+                                                           dialog.dismiss();
+                                                       }
+
+                                                   }).create();
+                                   alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                   alertDialog.show();
+                                   break;
+                               case 2:
+                                   if (canvansImageView.getPaintMode() != DrawView.COMMON_MODE) {
+                                       canvansImageView.setPaintMode(DrawView.COMMON_MODE);
+                                   }
+                                   break;
+                               case 3:
+                                   setsizeDialog = new Dialog(PaintMainActivity.this, android.R.style.Theme_Holo_Light_Dialog);
+                                   setsizeDialog.setTitle("画笔粗细");
+                                   setsizeDialog.setContentView(getLayoutInflater().inflate(R.layout.shape_paint, null));
+                                   setsizeDialog.getWindow().setLayout(DeviceInfoUtils.getScreenWidth(PaintMainActivity.this), ViewGroup.LayoutParams.WRAP_CONTENT);
+                                   setsizeDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                                       @Override
+                                       public void onShow(DialogInterface dialog) {
+                                           processImageView.displayPenSize(Integer.parseInt(OPUtils.getValFromSharedpreferences(Const.Key.PEN_COLOR_SIZE)));
+                                       }
+                                   });
+                                   penTextView = (TextView) setsizeDialog.getWindow().findViewById(R.id.process_text);
+                                   processImageView = (DisplayPenSizeView) setsizeDialog.getWindow().findViewById(R.id.pen_shape);
+                                   process_okButton = (Button) setsizeDialog.getWindow().findViewById(R.id.pen_ok);
+                                   process_cancelButton = (Button) setsizeDialog.getWindow().findViewById(R.id.pen_cancel);
+                                   process_okButton.setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           OPUtils.saveValToSharedpreferences(Const.Key.PEN_COLOR_SIZE, "" + penProcess);
+                                           canvansImageView.setPenSize(penProcess);
+                                           setsizeDialog.dismiss();
+                                       }
+                                   });
+                                   process_cancelButton.setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           setsizeDialog.dismiss();
+                                       }
+                                   });
+                                   penSeekBar = (SeekBar) setsizeDialog.getWindow().findViewById(R.id.pen_seekbar);
+                                   penSeekBar.setMax(50);
+                                   penSeekBar.setProgress(Integer.parseInt(OPUtils.getValFromSharedpreferences(Const.Key.PEN_COLOR_SIZE)));
+                                   penTextView.setText(OPUtils.getValFromSharedpreferences(Const.Key.PEN_COLOR_SIZE));
+                                   penSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                                       @Override
+                                       public void onStopTrackingTouch(SeekBar seekBar) {
+                                           penProcess = seekBar.getProgress();
+                                           processImageView.displayPenSize(penProcess);
+                                       }
+
+                                       @Override
+                                       public void onStartTrackingTouch(SeekBar seekBar) {
+                                       }
+
+                                       @Override
+                                       public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                                           penTextView.setText("" + progress);
+                                           processImageView.displayPenSize(progress);
+                                       }
+                                   });
+                                   setsizeDialog.show();
+                                   break;
+                               case 4:
+                                   Background backDialog = new Background(PaintMainActivity.this,
+                                           android.R.style.Theme_Holo_Light_Dialog);
+                                   backDialog.setTitle("更换背景图");
+                                   backDialog.show();
+                                   break;
+                               case 5:
+                                   if (canvansImageView.getPaintMode() != DrawView.ERASER_MODE) {
+                                       canvansImageView.setPaintMode(DrawView.ERASER_MODE);
+                                   }
+                                   break;
+                               case 6:
+                                   final Dialog colorDialog = new Dialog(PaintMainActivity.this, android.R.style.Theme_Holo_Light_Dialog);
+                                   colorDialog.setTitle("颜色选择");
+                                   colorDialog.setContentView(R.layout.dialog_for_selectcolor);
+                                   final ColorPicker colorPicker = (ColorPicker) colorDialog
+                                           .findViewById(R.id.picker);
+                                   colorPicker.setOldCenterColor(canvansImageView.getColor());
+                                   colorPicker.setColor(canvansImageView.getColor());
+                                   final OpacityBar opacityBar = (OpacityBar) colorDialog
+                                           .findViewById(R.id.opacitybar);
+                                   final CheckBox blackCheckBox = (CheckBox) colorDialog.findViewById(R.id.black_checkbox);
+                                   blackCheckBox.setChecked(isBlackColor);
+                                   colorPicker.addOpacityBar(opacityBar);
+                                   opacityBar.setOpacity(opacity);
+                                   Button colorOKButton = (Button) colorDialog
+                                           .findViewById(R.id.colorok);
+                                   Button colorCancelButton = (Button) colorDialog
+                                           .findViewById(R.id.colorcancel);
+                                   colorOKButton.setOnClickListener(new View.OnClickListener() {
+
+                                       @Override
+                                       public void onClick(View arg0) {
+                                           // colorPicker.getColor()
+                                           if (blackCheckBox.isChecked()) {
+                                               isBlackColor = true;
+                                               canvansImageView.setColor(Color.BLACK);
+                                           } else {
+                                               isBlackColor = false;
+                                               opacity = opacityBar.getOpacity();
+                                               canvansImageView.setColor(colorPicker.getColor());
+                                           }
+                                           //penAlpha=colorPicker.getAlpha();
+                                           colorDialog.dismiss();
+                                       }
+                                   });
+                                   colorCancelButton
+                                           .setOnClickListener(new View.OnClickListener() {
+
+                                               @Override
+                                               public void onClick(View arg0) {
+                                                   colorDialog.dismiss();
+                                               }
+                                           });
+                                   colorDialog.show();
+                                   break;
+                               case 7:
+                                   canvansImageView.clear();
+                                   break;
+                               case 8:
+                                   if(mTextInputDialog == null){
+                                       mTextInputDialog = new Dialog(PaintMainActivity.this, android.R.style.Theme_Holo_Light_Dialog);
+                                       mTextInputDialog.setTitle("自定义文字");
+                                       mTextInputDialog.setContentView(R.layout.dialog_text_input);
+                                       final EditText editInput = (EditText) mTextInputDialog.findViewById(R.id.edit_input);
+                                       Button btnOK = (Button) mTextInputDialog.findViewById(R.id.btn_ok);
+                                       Button btnCancel = (Button) mTextInputDialog.findViewById(R.id.btn_cancel);
+                                       btnOK.setOnClickListener(new View.OnClickListener(){
+                                           @Override
+                                           public void onClick(View v) {
+                                               paintText = editInput.getText().toString();
+                                               if (paintText.equals("")) {
+                                                   Toast.makeText(PaintMainActivity.this, "请输入自定义文字", Toast.LENGTH_SHORT).show();
+                                                   return;
+                                               }
+                                               canvansImageView.setPaintMode(DrawView.PASTETEXT_MODE);
+                                               canvansImageView.setPaintText(paintText);
+                                               mTextInputDialog.dismiss();
+                                           }
+                                       });
+                                       btnCancel.setOnClickListener(new View.OnClickListener() {
+                                           @Override
+                                           public void onClick(View v) {
+                                               mTextInputDialog.dismiss();
+                                           }
+                                       });
+                                   }
+                                   mTextInputDialog.show();
+                                   break;
+                           }
+
+                       }
+                   });
+                mOpDialog.show();
+            }
+        });
         mLayoutAd = (RelativeLayout) findViewById(R.id.layout_ad);
         MActivity = PaintMainActivity.this;
         String saveDir = Environment.getExternalStorageDirectory()
@@ -167,7 +404,6 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
             }
 
         }
-        canvansImageView = (DrawView) findViewById(R.id.img_canvans);
         canvasView = canvansImageView;
         mainView = findViewById(R.id.rlay);
         zoomCanvas = (ZoomControls) findViewById(R.id.zoom_control);
@@ -231,12 +467,19 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
                     int scaleX, scaleY, imageWidth, imageHeight;
                     imageWidth = options.outWidth;
                     imageHeight = options.outHeight;
-                    scaleX = imageWidth / DEFAULT_WIDTH;
-                    scaleY = imageHeight / DEFAULT_HEIGHT;
-                    options.inSampleSize = Math.max(scaleX, scaleY);
+                    scaleX = (imageWidth + DEFAULT_WIDTH - 1) / DEFAULT_WIDTH;
+                    scaleY = (imageHeight + DEFAULT_HEIGHT - 1) / DEFAULT_HEIGHT;
+                    int maxScale = Math.max(scaleX, scaleY);
+                    if(maxScale < 1)
+                        options.inSampleSize = 1;
+                    else
+                        options.inSampleSize = maxScale;
                     options.inJustDecodeBounds = false;
                     Bitmap btp = BitmapFactory.decodeFile(photopath, options);
                     canvansImageView.setImageBitmap(btp);
+                    //删除临时文件
+                    new File(photopath).delete();
+
                 } catch (Exception e) {
                     Toast.makeText(this, "文件保存失败，请重试...", Toast.LENGTH_SHORT)
                             .show();
@@ -246,27 +489,32 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
             } else if (requestCode == 2) {
                 try {
                     Uri uri = data.getData();
-                    String[] projStrings = {MediaStore.Images.Media.DATA};
-                    Cursor cursor = managedQuery(uri, projStrings, null, null,
-                            null);
-                    int cloum_index = cursor
-                            .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                    cursor.moveToFirst();
-                    String pathString = cursor.getString(cloum_index);
-                    /* cursor.close(); */
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inJustDecodeBounds = true;
-                    BitmapFactory.decodeFile(pathString, options);
-                    int imageWidth, imageHeight;
-                    imageWidth = options.outWidth;
-                    imageHeight = options.outHeight;
-                    int scaleX, scaleY;
-                    scaleX = imageWidth / DEFAULT_WIDTH;
-                    scaleY = imageHeight / DEFAULT_HEIGHT;
-                    options.inSampleSize = Math.max(scaleX, scaleY);
-                    options.inJustDecodeBounds = false;
-                    Bitmap bm = BitmapFactory.decodeFile(pathString, options);
-                    canvansImageView.setImageBitmap(bm);
+                    if(uri != null){
+                        InputStream inputStream = getContentResolver().openInputStream(uri);
+                        final BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inJustDecodeBounds = true;
+                        BitmapFactory.decodeStream(inputStream, null, options);
+                        inputStream.close();
+                        int imageWidth, imageHeight;
+                        imageWidth = options.outWidth;
+                        imageHeight = options.outHeight;
+                        Log.i(TAG, "imageWidth:" + imageWidth);
+                        Log.i(TAG, "imageHeight:" + imageHeight);
+                        int scaleX, scaleY;
+                        scaleX = (imageWidth + DEFAULT_WIDTH - 1) / DEFAULT_WIDTH;
+                        scaleY = (imageHeight + DEFAULT_HEIGHT - 1) / DEFAULT_HEIGHT;
+                        int maxScale = Math.max(scaleX, scaleY);
+                        if(maxScale < 1)
+                            options.inSampleSize = 1;
+                        else
+                            options.inSampleSize = maxScale;
+                        options.inSampleSize = Math.max(scaleX, scaleY);
+                        options.inJustDecodeBounds = false;
+                        inputStream = getContentResolver().openInputStream(uri);
+                        Bitmap bm = BitmapFactory.decodeStream(inputStream, null, options);
+                        canvansImageView.setImageBitmap(bm);
+                    }
+
                 } catch (Exception e) {
                     Toast.makeText(this, "选择图片失败...", Toast.LENGTH_SHORT)
                             .show();
@@ -349,8 +597,11 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
                 canvansImageView.redo();
                 break;
             case R.id.share:
+                if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                    showStorageRequestPermission();
+                    return true;
+                }
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                //shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
                 shareIntent.setType("image/*");
                 try {
                     SimpleDateFormat formatter = new SimpleDateFormat(
@@ -362,17 +613,25 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
                         dirFile.mkdirs();
                     File pathFile = new File(dirFile, date+".png");
                     canvansImageView.saveImage(pathFile.getAbsolutePath(), SHARE_MODE);
-                    Uri uri = Uri.fromFile(pathFile);
-                    shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                    PaintMainActivity.this.startActivity(Intent.createChooser(
-                            shareIntent, "请选择"));
+                    if(pathFile.exists()){
+                        Uri uri = Uri.fromFile(pathFile);
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                        PaintMainActivity.this.startActivity(Intent.createChooser(
+                                shareIntent, "请选择"));
+                    }else{
+                        Toast.makeText(PaintMainActivity.this, "文件保存失败", Toast.LENGTH_SHORT).show();
+                    }
                 } catch (Exception e) {
-
                     Toast.makeText(PaintMainActivity.this, "不存在可分享应用", Toast.LENGTH_SHORT)
                             .show();
                 }
                 break;
             case R.id.save:
+                if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                    showStorageRequestPermission();
+                    return true;
+                }
+
                 SimpleDateFormat formatter = new SimpleDateFormat(
                         "yyyy_MM_dd_kk_mm_ss");
                 String date = formatter.format(new java.util.Date());
@@ -389,9 +648,10 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
             case R.id.areaselect:
                 canvansImageView.setPaintMode(DrawView.CUT_MODE);
                 break;
+            /**
             case R.id.moreapp:
                 OPUtils.startActivity(this, RecomActivity.class);
-                break;
+                break;*/
             default:
                 break;
         }
@@ -463,277 +723,20 @@ public class PaintMainActivity extends AppBaseActivity implements BoomMenuButton
      * 初始化主界面功能
      **/
     public void initMain() {
-        Drawable[] mainDrawables = { ContextCompat.getDrawable(this, R.drawable.paste_main), ContextCompat.getDrawable(this, R.drawable.shape_main), ContextCompat.getDrawable(this, R.drawable.paint_main),
-                ContextCompat.getDrawable(this, R.drawable.size_main),ContextCompat.getDrawable(this, R.drawable.background_main), ContextCompat.getDrawable(this, R.drawable.erase_main),
-                ContextCompat.getDrawable(this, R.drawable.color_main), ContextCompat.getDrawable(this, R.drawable.empty_main), ContextCompat.getDrawable(this, R.drawable.text_main)};
-        int[][] mainColors = new int[9][2];
-        Random random = new Random();
-        for (int i = 0; i != 9; ++i) {
-            mainColors[i][0] = Color.parseColor(mColors[random.nextInt(9)]);
-            mainColors[i][1] = mainColors[i][0];
-        }
-        String contents[] = {"贴图", "形状", "画笔", "粗细", "背景", "橡皮", "颜色", "清空", "文字"};
-       // mButtonMenuMain.init(mainDrawables, contents, mainColors, ButtonType.CIRCLE, BoomType.PARABOLA, PlaceType.SHARE_9_1, null, null, null, null, null, null, 0);
-        new BoomMenuButton.Builder()
-                .subButtons(mainDrawables, mainColors, contents)
-                .button(ButtonType.CIRCLE)
-                .boom(BoomType.HORIZONTAL_THROW)
-                .place(PlaceType.CIRCLE_9_1)
-                .animator(this)
-                .boomButtonShadow(Util.getInstance().dp2px(2), Util.getInstance().dp2px(2))
-                .subButtonsShadow(Util.getInstance().dp2px(2), Util.getInstance().dp2px(2))
-                .onSubButtonClick(this)
-                .init(mButtonMenuMain);
 
     }
 
-    @Override
-    public void toShow() {
 
-    }
-
-    @Override
-    public void showing(float fraction) {
-
-    }
-
-    @Override
-    public void showed() {
-
-    }
-
-    @Override
-    public void toHide() {
-
-    }
-
-    @Override
-    public void hiding(float fraction) {
-
-    }
-
-    @Override
-    public void hided() {
-
-    }
-
-    @Override
-    public void onClick(int buttonIndex) {
-        switch (buttonIndex) {
-            case 0:
-                final Dialog displayPPDialog = new Dialog(PaintMainActivity.this, android.R.style.Theme_Holo_Light_Dialog);
-                displayPPDialog.setTitle("选择贴图");
-                displayPPDialog.setContentView(R.layout.pastephoto_layout);
-                //displayPPDialog.getWindow().setLayout();
-                GridView photoGridView = (GridView) displayPPDialog.findViewById(R.id.paste_grid);
-                //photoGridView.remove
-                PastePhotoAdapter adapter = new PastePhotoAdapter(PaintMainActivity.this);
-                photoGridView.setAdapter(adapter);
-                photoGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(
-                            AdapterView<?> parent, View view, int position, long id) {
-                        canvansImageView.setPaintMode(DrawView.COPY_MODE);
-                        Bitmap copyBitmap = BitmapFactory.decodeResource(getResources(), (int) id);
-                        canvansImageView.setCopyBitmap(copyBitmap);
-                        displayPPDialog.dismiss();
-                    }
-
-                });
-                displayPPDialog.show();
-                break;
-            case 1:
-                AlertDialog alertDialog = new AlertDialog.Builder(PaintMainActivity.this, android.R.style.Theme_Holo_Light_Dialog)
-                        .setTitle("选择绘图类型")
-                        .setSingleChoiceItems(
-                                new String[]{"直线", "折线", "矩形",
-                                        "六边形", "椭圆", "自由手绘"},
-                                canvansImageView.getCurrentShape(),
-                                new DialogInterface.OnClickListener() {
-
-                                    @Override
-                                    public void onClick(DialogInterface dialog,
-                                                        int which) {
-                                        switch (which) {
-
-                                            case Shape_Type.STRAIGIT:
-                                                canvansImageView
-                                                        .setShape(Shape_Type.STRAIGIT);
-                                                break;
-                                            case Shape_Type.BROKEN:
-                                                canvansImageView.setShape(Shape_Type.BROKEN);
-                                                break;
-                                            case Shape_Type.RECT:
-                                                canvansImageView
-                                                        .setShape(Shape_Type.RECT);
-                                                break;
-                                            case Shape_Type.MUTIL:
-                                                canvansImageView.setShape(Shape_Type.MUTIL);
-                                                break;
-                                            case Shape_Type.OVAL:
-                                                canvansImageView.setShape(Shape_Type.OVAL);
-                                                break;
-                                            case Shape_Type.FREE:
-                                                canvansImageView
-                                                        .setShape(Shape_Type.FREE);
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                        canvansImageView.setCurrentShape();
-                                        if (canvansImageView.getPaintMode() != DrawView.COMMON_MODE) {
-                                            // fillcolorImageView.setBackgroundColor(Color.TRANSPARENT);
-                                            // cutImageView.setBackgroundColor(Color.TRANSPARENT);
-                                            canvansImageView.setPaintMode(DrawView.COMMON_MODE);
-                                        }
-
-                                        dialog.dismiss();
-                                    }
-
-                                }).create();
-                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                alertDialog.show();
-                break;
-            case 2:
-                if (canvansImageView.getPaintMode() != DrawView.COMMON_MODE) {
-                    canvansImageView.setPaintMode(DrawView.COMMON_MODE);
-                }
-                break;
-            case 3:
-                setsizeDialog = new Dialog(PaintMainActivity.this, android.R.style.Theme_Holo_Light_Dialog);
-                setsizeDialog.setTitle("画笔粗细");
-                setsizeDialog.setContentView(getLayoutInflater().inflate(R.layout.shape_paint, null));
-                setsizeDialog.getWindow().setLayout(DeviceInfoUtils.getScreenWidth(PaintMainActivity.this), ViewGroup.LayoutParams.WRAP_CONTENT);
-                setsizeDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-                    @Override
-                    public void onShow(DialogInterface dialog) {
-                        processImageView.displayPenSize(Integer.parseInt(OPUtils.getValFromSharedpreferences(Const.Key.PEN_COLOR_SIZE)));
-                    }
-                });
-                penTextView = (TextView) setsizeDialog.getWindow().findViewById(R.id.process_text);
-                processImageView = (DisplayPenSizeView) setsizeDialog.getWindow().findViewById(R.id.pen_shape);
-                process_okButton = (Button) setsizeDialog.getWindow().findViewById(R.id.pen_ok);
-                process_cancelButton = (Button) setsizeDialog.getWindow().findViewById(R.id.pen_cancel);
-                process_okButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        OPUtils.saveValToSharedpreferences(Const.Key.PEN_COLOR_SIZE, "" + penProcess);
-                        canvansImageView.setPenSize(penProcess);
-                        setsizeDialog.dismiss();
-                    }
-                });
-                process_cancelButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        setsizeDialog.dismiss();
-                    }
-                });
-                penSeekBar = (SeekBar) setsizeDialog.getWindow().findViewById(R.id.pen_seekbar);
-                penSeekBar.setMax(50);
-                penSeekBar.setProgress(Integer.parseInt(OPUtils.getValFromSharedpreferences(Const.Key.PEN_COLOR_SIZE)));
-                penTextView.setText(OPUtils.getValFromSharedpreferences(Const.Key.PEN_COLOR_SIZE));
-                penSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                        penProcess = seekBar.getProgress();
-                        processImageView.displayPenSize(penProcess);
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-                    }
-
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        penTextView.setText("" + progress);
-                        processImageView.displayPenSize(progress);
-                    }
-                });
-                setsizeDialog.show();
-                break;
-            case 4:
-                Background backDialog = new Background(PaintMainActivity.this,
-                        android.R.style.Theme_Holo_Light_Dialog);
-                backDialog.setTitle("更换背景图");
-                backDialog.show();
-                break;
-            case 5:
-                if (canvansImageView.getPaintMode() != DrawView.ERASER_MODE) {
-                    canvansImageView.setPaintMode(DrawView.ERASER_MODE);
-                }
-                break;
-            case 6:
-                final Dialog colorDialog = new Dialog(PaintMainActivity.this, android.R.style.Theme_Holo_Light_Dialog);
-                colorDialog.setTitle("颜色选择");
-                colorDialog.setContentView(R.layout.dialog_for_selectcolor);
-                final ColorPicker colorPicker = (ColorPicker) colorDialog
-                        .findViewById(R.id.picker);
-                colorPicker.setOldCenterColor(canvansImageView.getColor());
-                colorPicker.setColor(canvansImageView.getColor());
-                final OpacityBar opacityBar = (OpacityBar) colorDialog
-                        .findViewById(R.id.opacitybar);
-                final CheckBox blackCheckBox = (CheckBox) colorDialog.findViewById(R.id.black_checkbox);
-                blackCheckBox.setChecked(isBlackColor);
-                colorPicker.addOpacityBar(opacityBar);
-                opacityBar.setOpacity(opacity);
-                Button colorOKButton = (Button) colorDialog
-                        .findViewById(R.id.colorok);
-                Button colorCancelButton = (Button) colorDialog
-                        .findViewById(R.id.colorcancel);
-                colorOKButton.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View arg0) {
-                        // colorPicker.getColor()
-                        if (blackCheckBox.isChecked()) {
-                            isBlackColor = true;
-                            canvansImageView.setColor(Color.BLACK);
-                        } else {
-                            isBlackColor = false;
-                            opacity = opacityBar.getOpacity();
-                            canvansImageView.setColor(colorPicker.getColor());
-                        }
-                        //penAlpha=colorPicker.getAlpha();
-                        colorDialog.dismiss();
-                    }
-                });
-                colorCancelButton
-                        .setOnClickListener(new View.OnClickListener() {
-
-                            @Override
-                            public void onClick(View arg0) {
-                                colorDialog.dismiss();
-                            }
-                        });
-                colorDialog.show();
-                break;
-            case 7:
-                canvansImageView.clear();
-                break;
-            case 8:
-                final EditText textEditText = new EditText(PaintMainActivity.this);
-                textEditText.setHint("输入自定义文字");
-                AlertDialog textDialog = new AlertDialog.Builder(PaintMainActivity.this, android.R.style.Theme_Holo_Light_Dialog)
-                        .setTitle("自定义文字").setView(textEditText).
-                                setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        paintText = textEditText.getText().toString();
-                                        if (paintText.equals("")) {
-                                            Toast.makeText(PaintMainActivity.this, "请输入自定义文字", Toast.LENGTH_SHORT).show();
-                                            return;
-                                        }
-                                        canvansImageView.setPaintMode(DrawView.PASTETEXT_MODE);
-                                        canvansImageView.setPaintText(paintText);
-                                        dialog.dismiss();
-                                    }
-                                }).setNegativeButton("取消", null).create();
-                textDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                textDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                textDialog.show();
-                break;
+    private void checkPermission(){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERMISSION_CODE);
         }
     }
 
+    private void showStorageRequestPermission(){
+        //提示权限设置对话框
+        new AlertDialog.Builder(this).setTitle("温馨提示").setMessage("您必须允许存储权限才能读取,保存,分享图片，可以通过系统设置授予应用权限")
+                .setPositiveButton("确定", null).setCancelable(false).show();
+    }
 }

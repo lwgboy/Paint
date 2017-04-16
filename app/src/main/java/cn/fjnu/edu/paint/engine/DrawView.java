@@ -1,10 +1,13 @@
 package cn.fjnu.edu.paint.engine;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Canvas;
@@ -16,6 +19,10 @@ import android.graphics.Point;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,9 +33,11 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.RunnableFuture;
 
 import cn.fjnu.edu.paint.R;
 import cn.fjnu.edu.paint.data.BitmapType;
@@ -105,13 +114,16 @@ public class DrawView extends ImageView {
     private String paintText = null;
 
     private Paint textPaint = null;
+    private Context mContext;
 
     public DrawView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        mContext = context;
     }
 
     public DrawView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
     }
 
     public Paint getPaint() {
@@ -158,23 +170,33 @@ public class DrawView extends ImageView {
 
 
     public void saveImage(String path, int mode) {
-
-        File saveFile = new File(path);
-        if (saveFile.exists())
-            saveFile.delete();
+        String savePath = path;
+        int saveMode = mode;
         try {
+            File saveFile = new File(savePath);
+            if (saveFile.exists())
+                saveFile.delete();
             FileOutputStream fileOutputStream = new FileOutputStream(saveFile);
             Bitmap bitmap = Bitmap.createBitmap(PaintMainActivity.drawWidth, PaintMainActivity.drawHeight, Bitmap.Config.RGB_565);
             draw(new Canvas(bitmap));
-            bitmap.compress(CompressFormat.PNG, 50, fileOutputStream);
+            bitmap.compress(CompressFormat.PNG, 80, fileOutputStream);
             fileOutputStream.flush();
             fileOutputStream.close();
-            if (mode == SAVE_MODE)
-                Toast.makeText(getContext(), "文件保存在" + path, Toast.LENGTH_SHORT).show();
+            //添加至媒体库
+            if(Build.VERSION.SDK_INT >= 19)
+                MediaScannerConnection.scanFile(mContext, new String[]{savePath}, null, null);
+            else{
+                Intent refreshIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                refreshIntent.setData(Uri.fromFile(new File(savePath)));
+                mContext.sendBroadcast(refreshIntent);
+            }
+            if (saveMode == SAVE_MODE)
+                Toast.makeText(getContext(), "文件保存在" + savePath, Toast.LENGTH_SHORT).show();
 
         } catch (Exception e) {
             Toast.makeText(getContext(), "保存图片发生异常:" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+
     }
 
 

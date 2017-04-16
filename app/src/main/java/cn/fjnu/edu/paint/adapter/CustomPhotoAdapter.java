@@ -1,16 +1,21 @@
 package cn.fjnu.edu.paint.adapter;
 import android.content.Context;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.edu.fjnu.utils.DeviceInfoUtils;
 import cn.fjnu.edu.paint.R;
 import cn.fjnu.edu.ui.activity.PaintMainActivity;
 
@@ -23,13 +28,13 @@ import cn.fjnu.edu.ui.activity.PaintMainActivity;
 public class CustomPhotoAdapter extends BaseAdapter{
 	private Context context;
 	private List<Integer> photoId=new ArrayList<Integer>();
-	private int resId;
+	private int mScreenWidth;
 	public CustomPhotoAdapter(PaintMainActivity mActivity){
 		context=mActivity;
 		for(int i=0;i<46;i++){
-				resId=mActivity.getResources().getIdentifier("b"+i,"drawable", context.getPackageName());
-				photoId.add(resId);
+			photoId.add(context.getResources().getIdentifier("b" + i, "drawable", context.getPackageName()));
 		}
+		mScreenWidth = DeviceInfoUtils.getScreenWidth(context);
 	}
 	@Override
 	public int getCount() {
@@ -49,19 +54,17 @@ public class CustomPhotoAdapter extends BaseAdapter{
 
 	@Override
 	public View getView(int position, View contentView, ViewGroup parentView) {
-		boolean isFirstCreate = false;
+		View itemView;
 		if(contentView == null){
 			LayoutInflater inflater=(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			contentView = inflater.inflate(R.layout.paste_img_layout, parentView, false);
-			isFirstCreate = true;
+			itemView = inflater.inflate(R.layout.paste_img_layout, parentView, false);
+		}else{
+			itemView = contentView;
 		}
-		ImageView imageView=(ImageView) contentView.findViewById(R.id.displaygridphoto);
-		if(isFirstCreate){
-			imageView.setScaleType(ScaleType.CENTER_INSIDE);
-			imageView.setLayoutParams(new LinearLayout.LayoutParams(PaintMainActivity.screenWidth/4, LinearLayout.LayoutParams.WRAP_CONTENT));
-		}
-		resId=context.getResources().getIdentifier("b"+position,"drawable", context.getPackageName());
-		imageView.setImageResource(resId);
-		return contentView;
+		ImageView imageView=(ImageView) itemView.findViewById(R.id.displaygridphoto);
+		imageView.setScaleType(ScaleType.CENTER_INSIDE);
+		imageView.setLayoutParams(new LinearLayout.LayoutParams(mScreenWidth / 4, LinearLayout.LayoutParams.WRAP_CONTENT));
+		imageView.setImageResource(photoId.get(position));
+		return imageView;
 	}
 }
