@@ -5,8 +5,10 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.BluetoothClass;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -15,13 +17,16 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -44,6 +49,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.UUID;
+
 import cn.edu.fjnu.utils.DeviceInfoUtils;
 import cn.edu.fjnu.utils.OPUtils;
 import cn.fjnu.edu.paint.R;
@@ -67,6 +75,7 @@ public class PaintMainActivity extends AppBaseActivity{
     public static final int CUT_MODE = 2;
     public static int saveType = SAVE_MODE;
     public static String photopath;
+    public static String mTmpCropPath;
     public static PaintMainActivity MActivity;
     public static int[] backID = new int[46];
     public static int[] bigBackId = new int[46];
@@ -460,25 +469,28 @@ public class PaintMainActivity extends AppBaseActivity{
         if (RESULT_OK == resultCode) {
             if (requestCode == 1) {
                 try {
-
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inJustDecodeBounds = true;
-                    BitmapFactory.decodeFile(photopath, options);
-                    int scaleX, scaleY, imageWidth, imageHeight;
-                    imageWidth = options.outWidth;
-                    imageHeight = options.outHeight;
-                    scaleX = (imageWidth + DEFAULT_WIDTH - 1) / DEFAULT_WIDTH;
-                    scaleY = (imageHeight + DEFAULT_HEIGHT - 1) / DEFAULT_HEIGHT;
-                    int maxScale = Math.max(scaleX, scaleY);
-                    if(maxScale < 1)
-                        options.inSampleSize = 1;
-                    else
-                        options.inSampleSize = maxScale;
-                    options.inJustDecodeBounds = false;
-                    Bitmap btp = BitmapFactory.decodeFile(photopath, options);
-                    canvansImageView.setImageBitmap(btp);
-                    //删除临时文件
-                    new File(photopath).delete();
+                    if(!startZoomPhoto(FileProvider.getUriForFile(this, "cn.fjnu.edu.paint.fileprovider", new File(photopath)))){
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inJustDecodeBounds = true;
+                        BitmapFactory.decodeFile(photopath, options);
+                        int scaleX, scaleY, imageWidth, imageHeight;
+                        imageWidth = options.outWidth;
+                        imageHeight = options.outHeight;
+                        scaleX = (imageWidth + DEFAULT_WIDTH - 1) / DEFAULT_WIDTH;
+                        scaleY = (imageHeight + DEFAULT_HEIGHT - 1) / DEFAULT_HEIGHT;
+                        int maxScale = Math.max(scaleX, scaleY);
+                        if(maxScale < 1)
+                            options.inSampleSize = 1;
+                        else
+                            options.inSampleSize = maxScale;
+                        options.inJustDecodeBounds = false;
+                        Bitmap btp = BitmapFactory.decodeFile(photopath, options);
+                        if(btp != null){
+                            canvansImageView.setImageBitmap(btp);
+                            if(photopath != null)
+                                new File(photopath).delete();
+                        }
+                    }
 
                 } catch (Exception e) {
                     Toast.makeText(this, "文件保存失败，请重试...", Toast.LENGTH_SHORT)
@@ -489,7 +501,28 @@ public class PaintMainActivity extends AppBaseActivity{
             } else if (requestCode == 2) {
                 try {
                     Uri uri = data.getData();
-                    if(uri != null){
+                    if(uri != null && uri.toString().startsWith("content://com.android.providers") && Build.VERSION.SDK_INT >= 19){
+                        String wholeID = DocumentsContract.getDocumentId(uri);
+                        String id = wholeID.split(":")[1];
+                        String[] column = { MediaStore.Images.Media.DATA };
+                        String sel = MediaStore.Images.Media._ID + "=?";
+                        Cursor cursor = getContentResolver().
+                                query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                        column, sel, new String[]{ id }, null);
+                        String filePath = "";
+                        if(cursor == null)
+                            return;
+                        int columnIndex = cursor.getColumnIndex(column[0]);
+
+                        if (cursor.moveToFirst()) {
+                            filePath = cursor.getString(columnIndex);
+                        }
+                        if(TextUtils.isEmpty(filePath))
+                            return;
+                        uri = FileProvider.getUriForFile(this, "cn.fjnu.edu.paint.fileprovider", new File(filePath));
+                        cursor.close();
+                    }
+                    if(uri != null && !startZoomPhoto(uri)){
                         InputStream inputStream = getContentResolver().openInputStream(uri);
                         final BitmapFactory.Options options = new BitmapFactory.Options();
                         options.inJustDecodeBounds = true;
@@ -552,6 +585,30 @@ public class PaintMainActivity extends AppBaseActivity{
                         canvansImageView.setImageBitmap(thePic);
                 }
 
+            }else if(requestCode == 4){
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(mTmpCropPath, options);
+                int scaleX, scaleY, imageWidth, imageHeight;
+                imageWidth = options.outWidth;
+                imageHeight = options.outHeight;
+                scaleX = (imageWidth + DEFAULT_WIDTH - 1) / DEFAULT_WIDTH;
+                scaleY = (imageHeight + DEFAULT_HEIGHT - 1) / DEFAULT_HEIGHT;
+                int maxScale = Math.max(scaleX, scaleY);
+                if(maxScale < 1)
+                    options.inSampleSize = 1;
+                else
+                    options.inSampleSize = maxScale;
+                options.inJustDecodeBounds = false;
+                Bitmap btp = BitmapFactory.decodeFile(mTmpCropPath, options);
+                if(btp != null){
+                    canvansImageView.setImageBitmap(btp);
+                }
+                //删除临时文件
+                if(photopath != null)
+                    new File(photopath).delete();
+                if(mTmpCropPath != null)
+                    new File(mTmpCropPath).delete();
             }
         }
     }
@@ -661,6 +718,37 @@ public class PaintMainActivity extends AppBaseActivity{
     @Override
     public boolean onMenuOpened(int featureId, Menu menu) {
         return super.onMenuOpened(featureId, menu);
+    }
+
+    /**
+     * 启动图片剪切
+     */
+    private boolean startZoomPhoto(Uri uri){
+        Intent intent = new Intent("com.android.camera.action.CROP");
+        mTmpCropPath = Environment.getExternalStorageDirectory() + File.separator + UUID.randomUUID().toString() + ".png";
+        Uri cropUri = FileProvider.getUriForFile(this, "cn.fjnu.edu.paint.fileprovider", new File(mTmpCropPath));
+        intent.setDataAndType(uri, "image/*");
+        List<ResolveInfo> resolveInfos = getPackageManager().queryIntentActivities(intent, 0);
+        if(resolveInfos == null || resolveInfos.size() == 0)
+            return false;
+        for(ResolveInfo itemInfo : resolveInfos){
+            Log.i(TAG, "startZoomPhoto->packageName:" + itemInfo.activityInfo.packageName);
+            grantUriPermission(itemInfo.activityInfo.packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            grantUriPermission(itemInfo.activityInfo.packageName, cropUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        }
+        intent.putExtra("crop", "true");
+        intent.putExtra("aspectX", drawWidth);
+        intent.putExtra("aspectY", drawHeight);
+        // 设置为true直接返回bitmap
+        intent.putExtra("return-data", false);
+        // 上面设为false的时候将MediaStore.EXTRA_OUTPUT关联一个Uri
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, cropUri);
+        intent.putExtra("outputFormat", CompressFormat.PNG.toString());
+        //getPackageManager().queryIntentActivities();
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        startActivityForResult(intent, 4);
+        return  true;
     }
 
     public ZoomControls getZoomCanvans() {

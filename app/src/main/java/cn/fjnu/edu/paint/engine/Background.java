@@ -3,6 +3,7 @@ package cn.fjnu.edu.paint.engine;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
@@ -11,14 +12,17 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 import cn.edu.fjnu.utils.DeviceInfoUtils;
@@ -45,8 +49,20 @@ public class Background extends Dialog {
 							PaintMainActivity.photopath = Environment.getExternalStorageDirectory() + File.separator + UUID.randomUUID().toString() + ".jpg";
 							Uri uri = FileProvider.getUriForFile(context, "cn.fjnu.edu.paint.fileprovider", new File(PaintMainActivity.photopath));
 							Intent intent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-							intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-							PaintMainActivity.MActivity.startActivityForResult(intent, 1);
+							List<ResolveInfo> resolveInfos = context.getPackageManager().queryIntentActivities(intent, 0);
+							if(resolveInfos == null || resolveInfos.size() == 0){
+								Toast.makeText(context, "未安装相机应用", Toast.LENGTH_SHORT).show();
+							}else{
+								for(ResolveInfo resolveInfo : resolveInfos){
+									context.grantUriPermission(resolveInfo.activityInfo.packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+									context.grantUriPermission(resolveInfo.activityInfo.packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+								}
+								intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+								intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+								intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+								PaintMainActivity.MActivity.startActivityForResult(intent, 1);
+							}
+
 						}
 						catch(Exception e){
 							e.printStackTrace();
@@ -57,7 +73,14 @@ public class Background extends Dialog {
 						Intent intent = new Intent();
 						intent.setType("image/*");
 						intent.setAction(Intent.ACTION_GET_CONTENT);
-						PaintMainActivity.MActivity.startActivityForResult(intent,2);
+						List<ResolveInfo> resolveInfos = context.getPackageManager().queryIntentActivities(intent, 0);
+						if(resolveInfos == null || resolveInfos.size() == 0){
+							Toast.makeText(context, "未安装图库应用", Toast.LENGTH_SHORT).show();
+						}else{
+							for(ResolveInfo resolveInfo : resolveInfos)
+								Log.i("Background", "resolveInfo->activityInfo->packageName:" + resolveInfo.activityInfo.packageName);
+							PaintMainActivity.MActivity.startActivityForResult(intent,2);
+						}
 						dismiss();
 						break;
 					case 2:
