@@ -14,8 +14,8 @@
 (5)支持区域操作：图元的复制，剪切，缩放，删除，旋转，填色等
 
 # Effect picture
-![](https://github.com/MoMoWait/Paint/tree/master/app/screenshots/Screenshot_20170720-142519.png)
-![](https://github.com/MoMoWait/Paint/tree/master/app/screenshots/Screenshot_20170720-142549.png)
-![](https://github.com/MoMoWait/Paint/tree/master/app/screenshots/Screenshot_20170720-142534.png)
-![](https://github.com/MoMoWait/Paint/tree/master/app/screenshots/Screenshot_20170720-142841.png)
+![](https://github.com/MoMoWait/Paint/blob/master/app/screenshots/Screenshot_20170720-142519.png)
+![](https://github.com/MoMoWait/Paint/blob/master/app/screenshots/Screenshot_20170720-142549.png)
+![](https://github.com/MoMoWait/Paint/blob/master/app/screenshots/Screenshot_20170720-142534.png)
+![](https://github.com/MoMoWait/Paint/blob/master/app/screenshots/Screenshot_20170720-142841.png)
 
