@@ -121,7 +121,7 @@ public class APPListAdapter extends BaseAdapter {
 		appTextView.setText(appNames[position]);
 		desTextView.setText(desNames[position]);
 		ImageView installImageView=new ImageView(context);
-		installImageView.setId(R.id.install_img);
+		//installImageView.setId(R.id.install_img);
 		//installImageView.setId(9);
 		viewX=DeviceInfoUtils.getScreenWidth(context)-viewUtils.getViewX(appImageView)-8.0f/5*itemHeight;
 		viewY=viewUtils.getViewY(appImageView);
