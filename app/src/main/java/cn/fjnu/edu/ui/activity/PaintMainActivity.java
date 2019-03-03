@@ -16,6 +16,7 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -158,7 +159,6 @@ public class PaintMainActivity extends AppBaseActivity{
             drawWidth = mainView.getWidth();
             drawHeight = mainView.getHeight();
             canvansImageView.setLayoutParams(new android.widget.LinearLayout.LayoutParams(mainView.getWidth(), mainView.getHeight()));
-            canvansImageView.setImageResource(R.drawable.whitebackground);
             isLoad = false;
             if (isMeasure) {
                 screenWidth = mainView.getWidth();
@@ -175,6 +175,7 @@ public class PaintMainActivity extends AppBaseActivity{
         DEFAULT_HEIGHT = DeviceInfoUtils.getScreenHeight(this) / 2;
         mImgShowOp = (ImageView) findViewById(R.id.img_show_op);
         canvansImageView = (DrawView) findViewById(R.id.img_canvans);
+        canvansImageView.setImageResource(R.drawable.whitebackground);
         mImgShowOp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -658,7 +659,7 @@ public class PaintMainActivity extends AppBaseActivity{
                     showStorageRequestPermission();
                     return true;
                 }
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                final Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("image/*");
                 try {
                     SimpleDateFormat formatter = new SimpleDateFormat(
@@ -671,10 +672,17 @@ public class PaintMainActivity extends AppBaseActivity{
                     File pathFile = new File(dirFile, date+".png");
                     canvansImageView.saveImage(pathFile.getAbsolutePath(), SHARE_MODE);
                     if(pathFile.exists()){
-                        Uri uri = Uri.fromFile(pathFile);
-                        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                        PaintMainActivity.this.startActivity(Intent.createChooser(
-                                shareIntent, "请选择"));
+                        MediaScannerConnection.scanFile(this, new String[]{pathFile.getAbsolutePath()}, new String[]{"image/*"}, new MediaScannerConnection.OnScanCompletedListener() {
+                            @Override
+                            public void onScanCompleted(String path, Uri uri) {
+                                if(uri != null){
+                                    shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                                    PaintMainActivity.this.startActivity(Intent.createChooser(
+                                            shareIntent, "请选择"));
+                                }
+                            }
+                        });
+
                     }else{
                         Toast.makeText(PaintMainActivity.this, "文件保存失败", Toast.LENGTH_SHORT).show();
                     }

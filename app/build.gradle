@@ -8,6 +8,8 @@ android {
         applicationId "cn.fjnu.edu.paint"
         minSdkVersion 14
         targetSdkVersion 28
+        versionName "4.2"
+        versionCode 29
     }
 
     lintOptions{
@@ -24,7 +26,7 @@ android {
 dependencies {
     implementation files('libs/androidutil.jar')
     implementation files('libs/universal-image-loader-1.6.1-with-src.jar')
-    implementation 'com.nineoldandroids:library:2.4.+'
+    implementation 'com.nineoldandroids:library:2.4.0'
     implementation 'com.github.navasmdc:MaterialDesign:1.5@aar'
     implementation 'com.android.support:appcompat-v7:26.0.0-alpha1'
     implementation 'com.nightonke:boommenu:1.0.9'
