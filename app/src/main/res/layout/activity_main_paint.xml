@@ -62,15 +62,17 @@
 		android:id="@+id/layout_ad"
 		android:layout_width="match_parent"
 		android:layout_height="40dp"
-		android:layout_alignParentBottom="true"/>
+		android:layout_alignParentBottom="true"
+		android:visibility="gone"/>
 
 	<ImageView
 		android:id="@+id/img_show_op"
 		android:layout_alignParentRight="true"
 		android:layout_alignParentEnd="true"
+		android:layout_alignParentBottom="true"
 		android:layout_margin="24dp"
-		android:layout_above="@+id/layout_ad"
 		android:layout_width="64dp"
 		android:layout_height="64dp"
-		android:src="@drawable/show_op"/>
+		android:src="@drawable/show_op"
+		android:scaleType="centerInside"/>
 </cn.fjnu.edu.paint.ui.EXRelativeLayout>

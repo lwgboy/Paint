@@ -28,6 +28,6 @@ dependencies {
     implementation files('libs/universal-image-loader-1.6.1-with-src.jar')
     implementation 'com.nineoldandroids:library:2.4.0'
     implementation 'com.github.navasmdc:MaterialDesign:1.5@aar'
-    implementation 'com.android.support:appcompat-v7:26.0.0-alpha1'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.nightonke:boommenu:1.0.9'
 }
