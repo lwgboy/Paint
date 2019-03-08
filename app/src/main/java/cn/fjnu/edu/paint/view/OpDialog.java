@@ -1,5 +1,6 @@
 package cn.fjnu.edu.paint.view;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -50,7 +51,8 @@ public class OpDialog extends  AppBaseDialog implements View.OnClickListener{
             opInfo.setResId(mPhotos[i]);
             opInfo.setTitle(mTitles[i]);
             OpItemView opItemView = new OpItemView(mContext, opInfo);
-            opItemView.setBackgroundResource(mBackgrounds[(i + i / 3) % 3]);
+            opItemView.setBackgroundColor(Color.parseColor("#515151"));
+            //opItemView.setBackgroundResource(mBackgrounds[(i + i / 3) % 3]);
             opItemView.setOnClickListener(this);
             GridLayout.LayoutParams itemViewParams = new GridLayout.LayoutParams();
             itemViewParams.width = itemWidth;
