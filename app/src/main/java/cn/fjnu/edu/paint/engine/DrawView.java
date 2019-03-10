@@ -169,7 +169,7 @@ public class DrawView extends ImageView {
     }
 
 
-    public void saveImage(String path, int mode) {
+    public void saveImage(String path, int mode, boolean isAddToMediaLibrary) {
         String savePath = path;
         int saveMode = mode;
         try {
@@ -182,13 +182,15 @@ public class DrawView extends ImageView {
             bitmap.compress(CompressFormat.PNG, 80, fileOutputStream);
             fileOutputStream.flush();
             fileOutputStream.close();
-            //添加至媒体库
-            if(Build.VERSION.SDK_INT >= 19)
-                MediaScannerConnection.scanFile(mContext, new String[]{savePath}, null, null);
-            else{
-                Intent refreshIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                refreshIntent.setData(Uri.fromFile(new File(savePath)));
-                mContext.sendBroadcast(refreshIntent);
+            if(isAddToMediaLibrary){
+                //添加至媒体库
+                if(Build.VERSION.SDK_INT >= 19)
+                    MediaScannerConnection.scanFile(mContext, new String[]{savePath}, null, null);
+                else{
+                    Intent refreshIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    refreshIntent.setData(Uri.fromFile(new File(savePath)));
+                    mContext.sendBroadcast(refreshIntent);
+                }
             }
             if (saveMode == SAVE_MODE)
                 Toast.makeText(getContext(), "文件保存在" + savePath, Toast.LENGTH_SHORT).show();

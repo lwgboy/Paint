@@ -670,7 +670,7 @@ public class PaintMainActivity extends AppBaseActivity{
                     if(!dirFile.exists())
                         dirFile.mkdirs();
                     File pathFile = new File(dirFile, date+".png");
-                    canvansImageView.saveImage(pathFile.getAbsolutePath(), SHARE_MODE);
+                    canvansImageView.saveImage(pathFile.getAbsolutePath(), SHARE_MODE, false);
                     if(pathFile.exists()){
                         MediaScannerConnection.scanFile(this, new String[]{pathFile.getAbsolutePath()}, new String[]{"image/*"}, new MediaScannerConnection.OnScanCompletedListener() {
                             @Override
@@ -705,7 +705,7 @@ public class PaintMainActivity extends AppBaseActivity{
                 if(!dirFile.exists())
                     dirFile.mkdirs();
                 File pathFile = new File(dirFile, date+".png");
-                canvansImageView.saveImage(pathFile.getAbsolutePath(), SAVE_MODE);
+                canvansImageView.saveImage(pathFile.getAbsolutePath(), SAVE_MODE, true);
                 break;
             case R.id.closecolor:
                 disClsColDialog();

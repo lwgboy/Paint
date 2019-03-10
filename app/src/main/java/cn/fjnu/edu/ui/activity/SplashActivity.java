@@ -15,10 +15,6 @@ import android.widget.TextView;
 import cn.fjnu.edu.paint.R;
 
 public class SplashActivity extends AppBaseActivity {
-	private LinearLayout ll_splash_main = null;
-	private TextView tv_splash_version = null;
-	private String versionText = null;
-	private ProgressDialog pd = null;
 	@SuppressLint("HandlerLeak")
 	private Handler handler = new Handler() {
 
@@ -35,13 +31,9 @@ public class SplashActivity extends AppBaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.splash);
-		ll_splash_main = (LinearLayout) findViewById(R.id.ll_splash_main);
-		tv_splash_version = (TextView)findViewById(R.id.tv_splash_version);
+		setContentView(R.layout.activity_splash);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		versionText = this.getVersion();
-		tv_splash_version.append(versionText);
 		new Thread() {
 			public void run() {
 
