@@ -1027,9 +1027,10 @@ public class DrawView extends ImageView {
 
     public void initTextPaint() {
         textPaint = new Paint();
-        textPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        textPaint.setStyle(Paint.Style.FILL);
         textPaint.setStrokeWidth(getPenSize());
-        textPaint.setTextSize(20 * getPenSize());
+        //textPaint.setTextSize(20 * getPenSize());
+        textPaint.setTextSize(1.5f * getPenSize());
         textPaint.setAntiAlias(true);
         textPaint.setStrokeCap(Paint.Cap.ROUND);
         textPaint.setStrokeJoin(Paint.Join.ROUND);

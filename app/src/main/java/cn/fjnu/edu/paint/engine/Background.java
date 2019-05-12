@@ -60,7 +60,7 @@ public class Background extends Dialog {
 									context.grantUriPermission(resolveInfo.activityInfo.packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 								}
 								intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-								intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+								//intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 								intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
 								PaintMainActivity.MActivity.startActivityForResult(intent, 1);
 							}

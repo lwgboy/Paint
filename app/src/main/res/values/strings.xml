@@ -55,4 +55,6 @@
        <string name="apprecom">应用推荐</string>
     <string name="about_ad">关于广告</string>
     <string name="enter_special_text">输入自定义文字</string>
+    <string name="text_size">文字大小</string>
+    <string name="hello">你好</string>
 </resources>

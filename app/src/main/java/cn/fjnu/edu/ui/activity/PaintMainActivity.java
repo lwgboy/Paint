@@ -27,7 +27,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -55,9 +57,11 @@ import java.util.UUID;
 
 import cn.edu.fjnu.utils.DeviceInfoUtils;
 import cn.edu.fjnu.utils.OPUtils;
+import cn.edu.fjnu.utils.SizeUtils;
 import cn.fjnu.edu.paint.R;
 import cn.fjnu.edu.paint.adapter.PastePhotoAdapter;
 import cn.fjnu.edu.paint.config.Const;
+import cn.fjnu.edu.paint.data.Configs;
 import cn.fjnu.edu.paint.data.Shape_Type;
 import cn.fjnu.edu.paint.engine.Background;
 import cn.fjnu.edu.paint.engine.DrawView;
@@ -65,6 +69,7 @@ import cn.fjnu.edu.paint.ui.ColorPicker;
 import cn.fjnu.edu.paint.ui.DisplayPenSizeView;
 import cn.fjnu.edu.paint.ui.OpacityBar;
 import cn.fjnu.edu.paint.view.OpDialog;
+import cn.fjnu.edu.paint.view.PaintTextView;
 import cn.fjnu.edu.paint.view.PastePhotoDialog;
 
 @SuppressLint("SimpleDateFormat")
@@ -363,12 +368,53 @@ public class PaintMainActivity extends AppBaseActivity{
                                        mTextInputDialog.setTitle("自定义文字");
                                        mTextInputDialog.setContentView(R.layout.dialog_text_input);
                                        final EditText editInput = (EditText) mTextInputDialog.findViewById(R.id.edit_input);
+                                       SeekBar seekBarText = mTextInputDialog.findViewById(R.id.sb_text);
+                                       final PaintTextView paintTextView = mTextInputDialog.findViewById(R.id.ptv);
+                                       seekBarText.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                                           @Override
+                                           public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                                               float dpTextSize = (progress * 1.0f  / seekBar.getMax())  * (Configs.MAX_PAINT_TEXT_SIZE - Configs.MIN_PAINT_TEXT_SIZE);
+                                               paintTextView.setTextSize(SizeUtils.dp2px(dpTextSize));
+                                               //读取EditText文字内容
+                                               //String inputText = editInput.getText().toString().trim();
+                                               //paintTextView.setText(inputText.trim());
+                                           }
+
+                                           @Override
+                                           public void onStartTrackingTouch(SeekBar seekBar) {
+
+                                           }
+
+                                           @Override
+                                           public void onStopTrackingTouch(SeekBar seekBar) {
+
+                                           }
+                                       });
+
+                                       editInput.addTextChangedListener(new TextWatcher() {
+                                           @Override
+                                           public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                                           }
+
+                                           @Override
+                                           public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                                           }
+
+                                           @Override
+                                           public void afterTextChanged(Editable s) {
+                                               //读取EditText文字内容
+                                               String inputText = editInput.getText().toString().trim();
+                                               paintTextView.setText(inputText.trim());
+                                           }
+                                       });
                                        Button btnOK = (Button) mTextInputDialog.findViewById(R.id.btn_ok);
                                        Button btnCancel = (Button) mTextInputDialog.findViewById(R.id.btn_cancel);
                                        btnOK.setOnClickListener(new View.OnClickListener(){
                                            @Override
                                            public void onClick(View v) {
-                                               paintText = editInput.getText().toString();
+                                               paintText = editInput.getText().toString().trim();
                                                if (paintText.equals("")) {
                                                    Toast.makeText(PaintMainActivity.this, "请输入自定义文字", Toast.LENGTH_SHORT).show();
                                                    return;
@@ -754,7 +800,7 @@ public class PaintMainActivity extends AppBaseActivity{
         intent.putExtra("outputFormat", CompressFormat.PNG.toString());
         //getPackageManager().queryIntentActivities();
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        //intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         startActivityForResult(intent, 4);
         return  true;
     }
