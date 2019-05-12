@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.RunnableFuture;
 
+import cn.edu.fjnu.utils.SizeUtils;
 import cn.fjnu.edu.paint.R;
 import cn.fjnu.edu.paint.data.BitmapType;
 import cn.fjnu.edu.paint.data.Shape_Type;
@@ -112,7 +113,8 @@ public class DrawView extends ImageView {
     public float srokeWidth = 5;
 
     private String paintText = null;
-
+    /**绘制的文字大小*/
+    private float mPaintTextSize = -1f;
     private Paint textPaint = null;
     private Context mContext;
 
@@ -1029,16 +1031,27 @@ public class DrawView extends ImageView {
         textPaint = new Paint();
         textPaint.setStyle(Paint.Style.FILL);
         textPaint.setStrokeWidth(getPenSize());
+        if(mPaintTextSize > 0f)
+            textPaint.setTextSize(mPaintTextSize);
+        else
+            textPaint.setTextSize(SizeUtils.dp2px(16));
         //textPaint.setTextSize(20 * getPenSize());
-        textPaint.setTextSize(1.5f * getPenSize());
+        //textPaint.setTextSize(1.5f * getPenSize());
         textPaint.setAntiAlias(true);
         textPaint.setStrokeCap(Paint.Cap.ROUND);
         textPaint.setStrokeJoin(Paint.Join.ROUND);
         textPaint.setColor(getColor());
+
     }
 
     public void setPaintText(String paintText) {
         this.paintText = paintText;
+    }
+
+    public void setPaintTextSize(float textSize){
+        mPaintTextSize = textSize;
+        if(textPaint != null)
+            textPaint.setTextSize(textSize);
     }
 
     private void FloodFill(Bitmap bmp, Point pt, int targetColor, int replacementColor) {

@@ -72,7 +72,7 @@ public class PaintTextView extends View {
         Log.i(TAG, "drawText->textWidth:" + 20);
         Log.i(TAG, "drawText->textHeight:" + 20);
         if(viewWidth > 0 && viewHeight > 0)
-            canvas.drawText(mText, 0, 0, mPaint);
+            canvas.drawText(mText, (viewWidth - textRect.width()) * 1.0f / 2, (viewHeight - textRect.height()) * 1.0f / 2 + textRect.height(), mPaint);
     }
 
     public void setText(String text){
@@ -95,8 +95,8 @@ public class PaintTextView extends View {
         mPaint.getTextBounds(mText, 0, mText.length(), textRect);
         ViewGroup.LayoutParams layoutParams = getLayoutParams();
         if(layoutParams != null){
-            layoutParams.width = (int)(textRect.width() * 1.5f);
-            layoutParams.height = (int)(textRect.height() * 1.5f);
+            layoutParams.width = (int)(textRect.width() + 20);
+            layoutParams.height = (int)(textRect.height() + 20);
             setLayoutParams(layoutParams);
             requestLayout();
         }
@@ -111,7 +111,7 @@ public class PaintTextView extends View {
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
-        //mPaint.setTextAlign(Paint.Align.LEFT);
+        //mPaint.setTextAlign(Paint.Align.CENTER);
         setTextSize(SizeUtils.dp2px(16f));
     }
 

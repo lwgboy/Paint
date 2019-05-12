@@ -24,14 +24,15 @@
         android:layout_height="wrap_content"
         android:max="100"
         android:animationResolution="100"
-        android:progress="6"
+        android:progress="16"
         android:layout_marginTop="10dp"/>
 
     <cn.fjnu.edu.paint.view.PaintTextView
         android:id="@+id/ptv"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_height="1dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"

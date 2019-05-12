@@ -368,7 +368,7 @@ public class PaintMainActivity extends AppBaseActivity{
                                        mTextInputDialog.setTitle("自定义文字");
                                        mTextInputDialog.setContentView(R.layout.dialog_text_input);
                                        final EditText editInput = (EditText) mTextInputDialog.findViewById(R.id.edit_input);
-                                       SeekBar seekBarText = mTextInputDialog.findViewById(R.id.sb_text);
+                                       final SeekBar seekBarText = mTextInputDialog.findViewById(R.id.sb_text);
                                        final PaintTextView paintTextView = mTextInputDialog.findViewById(R.id.ptv);
                                        seekBarText.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                                            @Override
@@ -419,6 +419,8 @@ public class PaintMainActivity extends AppBaseActivity{
                                                    Toast.makeText(PaintMainActivity.this, "请输入自定义文字", Toast.LENGTH_SHORT).show();
                                                    return;
                                                }
+                                               float dpTextSize = (seekBarText.getProgress() * 1.0f  / seekBarText.getMax())  * (Configs.MAX_PAINT_TEXT_SIZE - Configs.MIN_PAINT_TEXT_SIZE);
+                                               canvansImageView.setPaintTextSize(SizeUtils.dp2px(dpTextSize));
                                                canvansImageView.setPaintMode(DrawView.PASTETEXT_MODE);
                                                canvansImageView.setPaintText(paintText);
                                                mTextInputDialog.dismiss();
